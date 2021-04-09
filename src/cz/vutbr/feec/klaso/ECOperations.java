@@ -108,7 +108,7 @@ public class ECOperations {
         MessageDigest digest = null;
         digest = MessageDigest.getInstance("SHA-256");
         byte [] hash = digest.digest(Tk);
-        byte [] SecretKeyBytes= Arrays.copyOfRange(hash,0,Tk.length/2);
+        byte [] SecretKeyBytes= Arrays.copyOfRange(hash,0,hash.length/2);
         AESKey= new SecretKeySpec(SecretKeyBytes, 0, SecretKeyBytes.length, "AES");
         /* byte [] SecretKeyBytes= Arrays.copyOfRange(Tk,1,Tk.length);
         AESKey= new SecretKeySpec(SecretKeyBytes, 0, SecretKeyBytes.length, "AES");*/

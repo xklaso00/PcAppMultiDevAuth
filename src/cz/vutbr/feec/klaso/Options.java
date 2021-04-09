@@ -12,7 +12,7 @@ public class Options {
     private static BigInteger PubWatch256=new BigInteger("02726E54885BFA6595DBB16FEE753E6B685CABE85F26B23D5A7B4863FFAEE60C2C",16);
     public static int BYTELENGHT=32;
 
-    private static  void setSecurityLevel(int level)
+    public static  void setSecurityLevel(int level)
     {
         if (level>0&&level<5)
         {

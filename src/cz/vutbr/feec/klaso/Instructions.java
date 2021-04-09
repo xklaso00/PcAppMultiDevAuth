@@ -49,13 +49,13 @@ public class Instructions {
     };
     private byte [] COMSERVERSIGWATCH= new byte[]{(byte)0x80,
             (byte)0x07,
-            (byte)0x00,
+            (byte)0x02,
             (byte)0x00,
             (byte)0x40,
     };
     private byte [] COMSERVERSIGWATCH28= new byte[]{(byte)0x80,
             (byte)0x07,
-            (byte)0x00,
+            (byte)0x01,
             (byte)0x00,
             (byte)0x38,
     };
@@ -65,7 +65,7 @@ public class Instructions {
             (byte)0x06,
             (byte)0x00,
             (byte)0x00,
-            (byte)0x3C,
+            //(byte)0x3C,
     };
     public static final byte[] UNKNOWN_CMD_SW = { (byte)0x00,
             (byte)0x00};
@@ -101,8 +101,11 @@ public class Instructions {
         return com;
     }
     public byte []generateDecryptMe(byte[] msg) throws IOException {
+        String msgLenght=Integer.toHexString(msg.length);
+        byte dataLenght=Byte.parseByte(msgLenght,16);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
         outputStream.write(DECRYPTME);
+        outputStream.write(dataLenght);
         outputStream.write(msg);
         outputStream.write((byte)0x20);
         byte [] com=outputStream.toByteArray();

@@ -24,10 +24,11 @@ public class Main {
                 (byte)0x40,
                 (byte)0x50,
         };
+
+        Instructions instructions = new Instructions();
+        Options.setSecurityLevel(1);
         byte [] PubKey=Options.getMobileKey().toByteArray();
         byte [] PubKeyWatch=Options.getWatchKey().toByteArray();
-        Instructions instructions = new Instructions();
-
         try {
             TerminalFactory factory = TerminalFactory.getDefault();
             List<CardTerminal> terminals = factory.terminals().list();
@@ -56,12 +57,14 @@ public class Main {
 
 
 
-
+            long ST1=System.nanoTime();
             BigInteger hashOfServer=ecOperations.hashOfProver(ID);
             byte[] byteHash= utils.bytesFromBigInteger(hashOfServer);
             byte[] SigOfServer= ecOperations.generateSignatureOfServer(hashOfServer);
             //byte[] CommandToSave=instructions.generateCOMSERVERSIG(SigOfServer,byteHash);
             byte[] CommandToSave=instructions.generateCOMSERVERSIGWITHWATCH(SigOfServer,byteHash);
+            long dur1=System.nanoTime()-ST1;
+            System.out.println("our signature took "+dur1/1000000+" ms");
             //only phone
             /*
             ResponseAPDU responseServerSig = channel.transmit(new CommandAPDU(CommandToSave));
