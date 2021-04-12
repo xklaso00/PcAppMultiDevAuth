@@ -46,7 +46,13 @@ public class Utils {
             if (b.length == 32) {
                 return b;
             } else if (b.length > 32) {
-                return Arrays.copyOfRange(b, b.length - 32, b.length);
+                if (b[0] == 0)
+                {
+                    byte[] tmp = new byte[b.length - 1];
+                    System.arraycopy(b, 1, tmp, 0, tmp.length);
+                    b = tmp;
+                }
+                return b;
             } else {
                 byte[] buf = new byte[32];
                 System.arraycopy(b, 0, buf, buf.length - b.length, b.length);
@@ -90,6 +96,13 @@ public class Utils {
         byte [] hashToReturn = digest.digest(connectedBytes); //we are hashing different byte array each time, so replay attack should not work
         outputStream.close();
         return hashToReturn;
+    }
+    public static byte[] addFirstToByteArr(byte first, byte[] arr2) throws IOException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        output.write(first);
+        output.write(arr2);
+        byte[] result=output.toByteArray();
+        return result;
     }
 
 

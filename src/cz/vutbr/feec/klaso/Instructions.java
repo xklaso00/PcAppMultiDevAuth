@@ -59,7 +59,13 @@ public class Instructions {
             (byte)0x00,
             (byte)0x38,
     };
-
+    public static byte[] COMPLACEHOLDERCOM7=
+            new byte[]{(byte)0x80,
+                    (byte)0x07,
+                    (byte)0x01,
+                    (byte)0x00,
+                    (byte)0x20
+            };
     private byte[] DECRYPTME= new byte[]{
             (byte)0x80,
             (byte)0x06,

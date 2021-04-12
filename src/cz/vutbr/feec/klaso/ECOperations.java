@@ -1,5 +1,6 @@
 package cz.vutbr.feec.klaso;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyFactorySpi;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
 
@@ -11,6 +12,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -26,6 +28,7 @@ public class ECOperations {
     BigInteger Gy= new BigInteger("483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8", 16);
     ECCurve ellipticCurve= new ECCurve.Fp(prime,A,B);
     ECPoint G = ellipticCurve.createPoint(Gx,Gy);;
+    byte[] TvEncoded;
     BigInteger rand;
     BigInteger SecKey;
     private SecretKey AESKey;
@@ -36,8 +39,12 @@ public class ECOperations {
     {
         cs= new CurveSpecifics();
         SecKey=Options.getSecKey();
+        long start=System.nanoTime();
+        computeTv();
+        System.out.println("Test encoding took "+(System.nanoTime()-start)/1000000+"ms");
+
     }
-    public ECPoint computeTv()
+    public byte[] computeTv()
     {
         ECPoint tv;
 
@@ -47,10 +54,17 @@ public class ECOperations {
         } while (rand.compareTo(cs.getN()) >= 0);
 
         tv=cs.getG().multiply(rand);
-        return tv;
+        long start=System.nanoTime();
+        TvEncoded=tv.getEncoded(true);
+        System.out.println("Tv encoding took "+(System.nanoTime()-start)/1000000+"ms");
+        return  TvEncoded;
     }
     public BigInteger hashOfProver(byte[] ID) throws NoSuchAlgorithmException, IOException {
-        ECPoint tv= computeTv();
+
+        //ECPoint tv= computeTv();
+        //if(TvEncoded==null)
+        computeTv();
+
         MessageDigest digest = null;
         String typeOfHash;
         if(Options.SECURITY_LEVEL==1)
@@ -58,14 +72,15 @@ public class ECOperations {
         else
             typeOfHash="SHA-256";
         digest = MessageDigest.getInstance(typeOfHash);
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
         outputStream.write(ID);
         outputStream.write(utils.bytesFromBigInteger(cs.getN()));
-        outputStream.write(tv.getEncoded(true));
+        outputStream.write(TvEncoded);
         byte connectedBytes[] = outputStream.toByteArray( );
         byte [] hashToReturn = digest.digest(connectedBytes);
         outputStream.close();
-        System.out.println("tv is: "+utils.bytesToHex(tv.getEncoded(true)));
+        System.out.println("tv is: "+utils.bytesToHex(TvEncoded));
         System.out.println("Hash of us is: "+utils.bytesToHex(hashToReturn));
         BigInteger hash= new BigInteger(1,hashToReturn);
         return hash;
@@ -92,8 +107,10 @@ public class ECOperations {
         digest = MessageDigest.getInstance("SHA-256");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
         outputStream.write(clientID);
+
         outputStream.write(t.getEncoded(true));
         outputStream.write(tk.getEncoded(true));
+
         outputStream.write(prevMess);
         byte connectedBytes[] = outputStream.toByteArray( );
         byte [] hashToCheck = digest.digest(connectedBytes);
