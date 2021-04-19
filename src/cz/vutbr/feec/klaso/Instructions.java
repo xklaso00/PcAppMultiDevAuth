@@ -43,9 +43,15 @@ public class Instructions {
     };
     private byte [] COMSERVERSIG= new byte[]{(byte)0x80,
             (byte)0x05,
-            (byte)0x00,
+            (byte)0x02,
             (byte)0x00,
             (byte)0x40,
+    };
+    private byte [] COMSERVERSIG28= new byte[]{(byte)0x80,
+            (byte)0x05,
+            (byte)0x01,
+            (byte)0x00,
+            (byte)0x38,
     };
     private byte [] COMSERVERSIGWATCH= new byte[]{(byte)0x80,
             (byte)0x07,
@@ -73,6 +79,13 @@ public class Instructions {
             (byte)0x00,
             //(byte)0x3C,
     };
+    private static byte [] REGISTERID=
+            new byte[]{(byte)0x80,
+                    (byte)0x09,
+                    (byte)0x00,
+                    (byte)0x00,
+                    (byte)0x05
+            };
     public static final byte[] UNKNOWN_CMD_SW = { (byte)0x00,
             (byte)0x00};
 
@@ -81,13 +94,19 @@ public class Instructions {
     }
 
     public byte[] generateCOMSERVERSIG(byte[] sig, byte [] hash) throws IOException {
+        byte[] startOfCom;
+        if(Options.SECURITY_LEVEL==1)
+            startOfCom=COMSERVERSIG28;
+        else
+            startOfCom=COMSERVERSIG;
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
-        outputStream.write(COMSERVERSIG);
+        outputStream.write(startOfCom);
         outputStream.write(hash);
         outputStream.write(sig);
         outputStream.write((byte)0x20);
         byte [] com=outputStream.toByteArray();
         outputStream.close();
+        System.out.println("COM IS "+Utils.bytesToHex(com));
         return com;
     }
     public byte[] generateCOMSERVERSIGWITHWATCH(byte[] sig, byte [] hash) throws IOException {
@@ -107,16 +126,14 @@ public class Instructions {
         return com;
     }
     public byte []generateDecryptMe(byte[] msg) throws IOException {
-        String msgLenght=Integer.toHexString(msg.length);
-        byte dataLenght=Byte.parseByte(msgLenght,16);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
-        outputStream.write(DECRYPTME);
-        outputStream.write(dataLenght);
-        outputStream.write(msg);
-        outputStream.write((byte)0x20);
-        byte [] com=outputStream.toByteArray();
-        outputStream.close();
+        String msgLength=Integer.toHexString(msg.length);
+        byte dataLength=Byte.parseByte(msgLength,16);
+        byte [] com=Utils.mergeWithDataLength(DECRYPTME,dataLength,msg,(byte)0x20);
+
         return com;
+    }
+    public static byte[] generateRegisterDeviceCOM(byte[] ID) throws IOException {
+        return Utils.mergeThreeByteArrays(REGISTERID,ID,(byte)0x21);
     }
 
     public byte[] getAID() {

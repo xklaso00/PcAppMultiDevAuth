@@ -87,7 +87,7 @@ public class ECOperations {
     }
     public byte[] generateSignatureOfServer(BigInteger hash)
     {
-        BigInteger mid= (hash.multiply(SecKey)).mod(cs.getN());
+        BigInteger mid= (hash.multiply(Options.getSecKey())).mod(cs.getN());
         BigInteger sv = (rand.subtract(mid)).mod(cs.getN());
         byte [] signature= utils.bytesFromBigInteger(sv);
         System.out.println("sv is: "+utils.bytesToHex(signature));
@@ -96,15 +96,20 @@ public class ECOperations {
     public boolean verifyClientSig2(byte[] clientID, byte[] clientHash, byte [] clientSig, byte[] pubB,byte[] prevMess) throws NoSuchAlgorithmException, IOException {
         BigInteger s= new BigInteger(1,clientSig);
         BigInteger e= new BigInteger(1,clientHash);
-        ECPoint mid= G.multiply(s);
+        ECPoint mid= cs.getG().multiply(s);
 
-        ECPoint pubPoint= ellipticCurve.decodePoint(pubB);
+        ECPoint pubPoint= cs.getCurve().decodePoint(pubB);
         ECPoint mid2=pubPoint.multiply(e);
         ECPoint t= mid.add(mid2);
         ECPoint tk=t.multiply(rand);
 
         MessageDigest digest = null;
-        digest = MessageDigest.getInstance("SHA-256");
+        String hashFunction;
+        if(Options.SECURITY_LEVEL==1)
+            hashFunction="SHA-224";
+        else
+            hashFunction="SHA-256";
+        digest = MessageDigest.getInstance(hashFunction);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
         outputStream.write(clientID);
 

@@ -16,6 +16,22 @@ public class Options {
     public static HashMap<String,BigInteger> KeyPairs224;
     public static HashMap<String,BigInteger> KeyPairs256;
     public static byte[] ActiveID;
+
+
+    public static void addKeys(byte[] devID,BigInteger key224,BigInteger key256)
+    {
+        KeyPairs224.put(Utils.bytesToHex(devID),key224);
+        KeyPairs256.put(Utils.bytesToHex(devID),key256);
+        ClientKeyFile.WriteHashMapToFile(KeyPairs224,1);
+        ClientKeyFile.WriteHashMapToFile(KeyPairs256,2);
+    }
+    public static boolean HasID(byte[] ID) throws IOException {
+        byte[] firstID=Utils.addFirstToByteArr((byte)0x00,ID);
+        if(KeyPairs256.containsKey(Utils.bytesToHex(firstID)))
+            return true;
+        else
+            return false;
+    }
     public static void setMaps()
     {
         KeyPairs224=ClientKeyFile.LoadHashMapFromFile(1);
@@ -49,7 +65,7 @@ public class Options {
     }
     public static  void setSecurityLevel(int level)
     {
-        if (level>0&&level<5)
+        if (level>0&&level<3)
         {
             SECURITY_LEVEL=level;
         }

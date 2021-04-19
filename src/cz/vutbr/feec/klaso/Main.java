@@ -2,6 +2,7 @@ package cz.vutbr.feec.klaso;
 import org.bouncycastle.math.ec.ECPoint;
 
 import javax.smartcardio.*;
+import javax.swing.*;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -15,15 +16,15 @@ public class Main {
 
     public static void main(String[] args) {
 	// write your code here
-        Card card = null;
-        CardChannel channel = null;
-        Utils utils= new Utils();
+        //Card card = null;
+       // CardChannel channel = null;
+        //Utils utils= new Utils();
         //BigInteger PubBig= new BigInteger("02DFF1D77F2A671C5F36183726DB2341BE58FEAE1DA2DECED843240F7B502BA659",16);
         //BigInteger PubWatch= new BigInteger("02726E54885BFA6595DBB16FEE753E6B685CABE85F26B23D5A7B4863FFAEE60C2C",16);
-        byte [] ID;
+        //byte [] ID;
 
-        Instructions instructions = new Instructions();
-        Options.setSecurityLevel(1);
+        //Instructions instructions = new Instructions();
+        Options.setSecurityLevel(2);
        /* HashMap<String,BigInteger>IdKeyPairs=new HashMap<String,BigInteger>();
         try {
             byte[] IDMob=Utils.addFirstToByteArr((byte)0x00,ID);
@@ -37,6 +38,14 @@ public class Main {
         }
         ClientKeyFile.WriteHashMapToFile(IdKeyPairs,Options.SECURITY_LEVEL);*/
         Options.setMaps();
+        AppGUI frame= new AppGUI();
+        frame.setContentPane(new AppGUI().PanelMain);
+
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setSize(700,500);
+        frame.setVisible(true);
+        //Terminal.MultiDevAuth();
         /*Options.setID(ID);
 
 
@@ -44,7 +53,7 @@ public class Main {
         byte [] PubKeyWatch=Utils.bytesFromBigInteger(Options.GetKey(1));
         System.out.println("Pub key of dev 0 is "+Utils.bytesToHex(PubKey));
         System.out.println("Pub key of dev 1 is "+Utils.bytesToHex(PubKeyWatch));*/
-        try {
+        /*try {
             TerminalFactory factory = TerminalFactory.getDefault();
             List<CardTerminal> terminals = factory.terminals().list();
             System.out.println("Terminals: " + terminals);
@@ -86,7 +95,7 @@ public class Main {
             //byte[] CommandToSave=instructions.generateCOMSERVERSIG(SigOfServer,byteHash);
             byte[] CommandToSave=instructions.generateCOMSERVERSIGWITHWATCH(SigOfServer,byteHash);
             long dur1=System.nanoTime()-ST1;
-            System.out.println("our signature took "+dur1+" ns");
+            System.out.println("our signature took "+dur1+" ns");*/
             //only phone
             /*
             ResponseAPDU responseServerSig = channel.transmit(new CommandAPDU(CommandToSave));
@@ -99,7 +108,7 @@ public class Main {
             boolean isItTrue=ecOperations.verifyClientSig2(ClientID,ClientHash,ClientSig,PubKey,CommandToSave);
             System.out.println("is it legit tho? "+isItTrue);
             */
-            long timeForApduRes;
+           /* long timeForApduRes;
             long TimeToGetSign=System.nanoTime();
             byte[] byteResponseServerSig;
             byte[] CommandToSave2=CommandToSave;
@@ -156,7 +165,7 @@ public class Main {
         catch (Exception e)
         {
             e.printStackTrace();
-        }
+        }*/
 
     }
 }

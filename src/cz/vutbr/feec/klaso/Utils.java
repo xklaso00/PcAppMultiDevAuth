@@ -102,6 +102,36 @@ public class Utils {
         output.write(first);
         output.write(arr2);
         byte[] result=output.toByteArray();
+        output.close();
+        return result;
+    }
+    public static byte[] mergeFourByteArrays(byte[] arr1,byte[] arr2, byte[] arr3,byte endByte) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+        outputStream.write(arr1);
+        outputStream.write(arr2);
+        outputStream.write(arr3);
+        outputStream.write(endByte);
+        byte[] result=outputStream.toByteArray();
+        outputStream.close();
+        return result;
+    }
+    public static byte[] mergeWithDataLength(byte[] arr1, byte dataLength, byte[] arr3, byte endByte) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+        outputStream.write(arr1);
+        outputStream.write(dataLength);
+        outputStream.write(arr3);
+        outputStream.write(endByte);
+        byte[] result=outputStream.toByteArray();
+        outputStream.close();
+        return result;
+    }
+    public static byte[] mergeThreeByteArrays(byte[] arr1,byte[] arr2,byte endByte) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+        outputStream.write(arr1);
+        outputStream.write(arr2);
+        outputStream.write(endByte);
+        byte[] result=outputStream.toByteArray();
+        outputStream.close();
         return result;
     }
 

@@ -29,7 +29,7 @@ public class ClientKeyFile {
     }
     public static HashMap<String,BigInteger> LoadHashMapFromFile(int Security)
     {
-        HashMap<String,BigInteger> IdKeyPairs=null;
+        HashMap<String,BigInteger> IdKeyPairs=new HashMap<String, BigInteger>();
         String keyFile;
         if(Security==1)
             keyFile=keyFile224;
