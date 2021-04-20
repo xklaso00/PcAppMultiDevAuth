@@ -17,6 +17,8 @@ public class AppGUI extends  JFrame{
     private JLabel SingleDevLabel;
     private JButton registerBttn;
     private JLabel RegisterLabel;
+    private JButton AnotherDevBttn;
+    private JLabel SecDevLabel;
 
     public AppGUI() {
         //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -97,7 +99,7 @@ public class AppGUI extends  JFrame{
                 SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
                     @Override
                     protected Boolean doInBackground() throws Exception {
-                        return Terminal.SingleDevAuth();
+                        return Terminal.SingleDevAuth(true);
                     }
 
                     // Can safely update the GUI from this method.
@@ -140,6 +142,35 @@ public class AppGUI extends  JFrame{
                                 RegisterLabel.setText("Register Successful");
                             else
                                 RegisterLabel.setText("Register Failed");
+                            return;
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                };
+                worker.execute();
+            }
+        });
+        AnotherDevBttn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
+                    @Override
+                    protected Boolean doInBackground() throws Exception {
+                        return Terminal.registerAnotherDevice();
+                    }
+                    // Can safely update the GUI from this method.
+                    protected void done() {
+                        boolean status;
+                        try {
+                            status=get();
+                            if(status)
+                                SecDevLabel.setText("Register Successful");
+                            else
+                                SecDevLabel.setText("Register Failed");
                             return;
                         } catch (InterruptedException e) {
                             e.printStackTrace();

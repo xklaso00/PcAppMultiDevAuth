@@ -86,6 +86,7 @@ public class Instructions {
                     (byte)0x00,
                     (byte)0x05
             };
+
     public static final byte[] UNKNOWN_CMD_SW = { (byte)0x00,
             (byte)0x00};
 
@@ -134,6 +135,10 @@ public class Instructions {
     }
     public static byte[] generateRegisterDeviceCOM(byte[] ID) throws IOException {
         return Utils.mergeThreeByteArrays(REGISTERID,ID,(byte)0x21);
+    }
+    public static byte[] generateAddDevCOM(byte numOfDev)
+    {
+        return new byte[]{(byte)0x80, (byte)0x10,numOfDev,(byte)0x00,(byte)0x42};
     }
 
     public byte[] getAID() {

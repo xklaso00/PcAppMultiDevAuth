@@ -17,6 +17,33 @@ public class Options {
     public static HashMap<String,BigInteger> KeyPairs256;
     public static byte[] ActiveID;
 
+    public static void DelID(byte[] ID)
+    {
+        KeyPairs256.remove(Utils.bytesToHex(ID));
+        KeyPairs224.remove(Utils.bytesToHex(ID));
+        System.out.println("ID "+Utils.bytesToHex(ID) +"was deleted");
+    }
+    public static int numOfDevWithActiveID()
+    {
+        boolean stayInLoop=true;
+        int devNum=0;
+        while(stayInLoop)
+        {
+            String hex = Integer.toHexString(devNum);
+            byte index=Byte.parseByte(hex,16);
+            try
+            {
+                byte[] toFindByte=Utils.addFirstToByteArr(index,ActiveID);
+                String StringID=Utils.bytesToHex(toFindByte);
+                stayInLoop =KeyPairs256.containsKey(StringID);
+                if(stayInLoop)
+                    devNum++;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return  devNum;
+    }
 
     public static void addKeys(byte[] devID,BigInteger key224,BigInteger key256)
     {
@@ -36,6 +63,7 @@ public class Options {
     {
         KeyPairs224=ClientKeyFile.LoadHashMapFromFile(1);
         KeyPairs256=ClientKeyFile.LoadHashMapFromFile(2);
+
     }
     public static void setID(byte[] ID)
     {

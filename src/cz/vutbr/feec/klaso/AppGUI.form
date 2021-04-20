@@ -76,6 +76,8 @@
             <properties>
               <horizontalAlignment value="0"/>
               <horizontalTextPosition value="0"/>
+              <maximumSize width="350" height="16"/>
+              <minimumSize width="350" height="16"/>
               <preferredSize width="350" height="16"/>
               <text value="Press the button to start single Device Athentication"/>
             </properties>
@@ -100,7 +102,7 @@
         <children>
           <component id="8323a" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
             <constraints>
-              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="4" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
+              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="4" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="158" height="116"/>
               </grid>
               <gridbag top="0" left="20" bottom="0" right="20" weightx="1.0" weighty="0.3"/>
@@ -116,7 +118,7 @@
           </component>
           <component id="e03" class="javax.swing.JLabel" binding="LabelSec">
             <constraints>
-              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="1" fill="0" indent="0" use-parent-layout="false">
+              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="1" fill="0" indent="0" use-parent-layout="false">
                 <minimum-size width="50" height="50"/>
               </grid>
               <gridbag weightx="1.0" weighty="0.1"/>
@@ -128,8 +130,8 @@
           </component>
           <hspacer id="fadcc">
             <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="0.0" weighty="2.0"/>
+              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="1.4"/>
             </constraints>
           </hspacer>
           <component id="4e15" class="javax.swing.JButton" binding="registerBttn">
@@ -143,15 +145,42 @@
           </component>
           <component id="fed5b" class="javax.swing.JLabel" binding="RegisterLabel">
             <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="1" fill="0" indent="0" use-parent-layout="false"/>
               <gridbag weightx="1.0" weighty="0.2"/>
             </constraints>
             <properties>
               <horizontalAlignment value="0"/>
               <horizontalTextPosition value="0"/>
+              <maximumSize width="300" height="16"/>
+              <minimumSize width="300" height="16"/>
               <preferredSize width="300" height="16"/>
               <text value="Press this button to register new phone"/>
               <verifyInputWhenFocusTarget value="true"/>
+              <verticalAlignment value="1"/>
+              <verticalTextPosition value="1"/>
+            </properties>
+          </component>
+          <component id="39ad7" class="javax.swing.JButton" binding="AnotherDevBttn">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag top="0" left="20" bottom="0" right="20" weightx="0.0" weighty="0.2"/>
+            </constraints>
+            <properties>
+              <text value="Add Another Device"/>
+            </properties>
+          </component>
+          <component id="e5cb0" class="javax.swing.JLabel" binding="SecDevLabel">
+            <constraints>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <horizontalAlignment value="0"/>
+              <horizontalTextPosition value="0"/>
+              <maximumSize width="250" height="16"/>
+              <minimumSize width="250" height="16"/>
+              <preferredSize width="250" height="16"/>
+              <text value="Press this button to register alt Device"/>
             </properties>
           </component>
         </children>

@@ -56,7 +56,7 @@ public class Terminal {
         }
     }
 
-    public static boolean SingleDevAuth()
+    public static boolean SingleDevAuth(boolean disconnectCard)
     {
         boolean cont=InitializeCardConnection();
         if(!cont)
@@ -75,12 +75,15 @@ public class Terminal {
             byte [] ClientSig= Arrays.copyOfRange(byteResponseServerSig,Options.BYTELENGHT+5,byteResponseServerSig.length);
             boolean isItTrue=ecOperations.verifyClientSig2(ClientID,ClientHash,ClientSig,PubKey,CommandToSave);
             System.out.println("is it legit tho? "+isItTrue);
+            if(disconnectCard)
+                card.disconnect(false);
             return  isItTrue;
 
         }
         catch (Exception e)
         {
-            System.out.println(e.getMessage());
+            System.out.println(e.toString());
+
         }
 
 
@@ -142,7 +145,7 @@ public class Terminal {
                 //sleep(100);
             }while(utils.isCommand(instructions.NOTYET,byteResponseServerSig));
 
-            System.out.println("To get back proof after succesfull command took "+ (System.nanoTime()-timeForApduRes)/1000000+" ms");
+            System.out.println("To get back proof after successful command took "+ (System.nanoTime()-timeForApduRes)/1000000+" ms");
             if(utils.isEqual(byteResponseServerSig,Instructions.UNKNOWN_CMD_SW))
             {
                 card.disconnect(false);
@@ -219,10 +222,52 @@ public class Terminal {
         {
             System.out.println(e.getMessage());
         }
+        return false;
+    }
+    public static boolean registerAnotherDevice()
+    {
+        boolean singleDone= SingleDevAuth(false);
+        if(!singleDone)
+            return false;
+        //this is here for testing to delete last watch key
+        try {
+            byte[] IDtoDel=Utils.addFirstToByteArr((byte)0x01,Options.ActiveID);
+            Options.DelID(IDtoDel);
+        }
+        catch (Exception e)
+        {
+
+        }
+
+        int newIndex= Options.numOfDevWithActiveID();
+        String hex = Integer.toHexString(newIndex);
+        byte byteIndex=Byte.parseByte(hex,16);
+        byte[] NewDevCom=Instructions.generateAddDevCOM(byteIndex);
+        System.out.println("Command is "+Utils.bytesToHex(NewDevCom));
+        try {
+
+            byte[] byteResponseReg;
+            do {
+                ResponseAPDU newDeviceResponse= channel.transmit(new CommandAPDU(NewDevCom));
+                byteResponseReg = newDeviceResponse.getBytes();
+                System.out.println("Answer is: " + utils.bytesToHex(byteResponseReg));
+                //sleep(100);
+            }while(utils.isCommand(instructions.NOTYET,byteResponseReg));
+
+            if(byteResponseReg.length<3)
+                return false;
+            byte[] NewPub32=Arrays.copyOfRange(byteResponseReg,0,33);
+            byte[] NewPub28=Arrays.copyOfRange(byteResponseReg,33,byteResponseReg.length);
+            byte[] newDevID=Utils.addFirstToByteArr(byteIndex,Options.ActiveID);
+            Options.addKeys(newDevID,new BigInteger(1,NewPub28),new BigInteger(1,NewPub32));
+            card.disconnect(false);
+            return true;
 
 
+        } catch (CardException | IOException e) {
+            e.printStackTrace();
+        }
 
-
-        return true;
+        return false;
     }
 }
