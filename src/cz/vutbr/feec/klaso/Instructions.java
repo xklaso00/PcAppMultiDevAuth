@@ -140,6 +140,13 @@ public class Instructions {
     {
         return new byte[]{(byte)0x80, (byte)0x10,numOfDev,(byte)0x00,(byte)0x42};
     }
+    public static byte[] returnDoneCOM(boolean isItTrue)
+    {
+        if (isItTrue)
+            return new byte[]{(byte)0x80, (byte)0x20,(byte)0x00,(byte)0x00,(byte)0x00};
+        else
+            return new byte[]{(byte)0x80, (byte)0x20,(byte)0x01,(byte)0x00,(byte)0x00};
+    }
 
     public byte[] getAID() {
         return AID;

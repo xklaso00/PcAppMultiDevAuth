@@ -69,14 +69,23 @@ public class Terminal {
             ResponseAPDU responseServerSig = channel.transmit(new CommandAPDU(CommandToSave));
             byte[] byteResponseServerSig = responseServerSig.getBytes();
             System.out.println("Answer is: "+utils.bytesToHex(byteResponseServerSig));
-
+            if(utils.isEqual(byteResponseServerSig,Instructions.UNKNOWN_CMD_SW))
+            {
+                card.disconnect(false);
+                return false;
+            }
             byte [] ClientID= Arrays.copyOfRange(byteResponseServerSig,0,5);
             byte [] ClientHash= Arrays.copyOfRange(byteResponseServerSig,5,Options.BYTELENGHT+5);
             byte [] ClientSig= Arrays.copyOfRange(byteResponseServerSig,Options.BYTELENGHT+5,byteResponseServerSig.length);
             boolean isItTrue=ecOperations.verifyClientSig2(ClientID,ClientHash,ClientSig,PubKey,CommandToSave);
             System.out.println("is it legit tho? "+isItTrue);
-            if(disconnectCard)
+
+
+            if(disconnectCard) {
+                byte [] ResultCom=Instructions.returnDoneCOM(isItTrue);
+                ResponseAPDU responseResultOfCom=channel.transmit(new CommandAPDU(ResultCom));
                 card.disconnect(false);
+            }
             return  isItTrue;
 
         }
@@ -136,18 +145,21 @@ public class Terminal {
             long TimeToGetSign=System.nanoTime();
             byte[] byteResponseServerSig;
             byte[] CommandToSave2=CommandToSave;
+            int timer=0;
             do {
                 timeForApduRes=System.nanoTime();
                 ResponseAPDU responseServerSig = channel.transmit(new CommandAPDU(CommandToSave2));
                 byteResponseServerSig = responseServerSig.getBytes();
                 CommandToSave2=Instructions.COMPLACEHOLDERCOM7;
                 System.out.println("Answer is: " + utils.bytesToHex(byteResponseServerSig));
-                //sleep(100);
-            }while(utils.isCommand(instructions.NOTYET,byteResponseServerSig));
+                timer++;
+                sleep(100);
+            }while(utils.isCommand(instructions.NOTYET,byteResponseServerSig)&&timer<15);
 
             System.out.println("To get back proof after successful command took "+ (System.nanoTime()-timeForApduRes)/1000000+" ms");
-            if(utils.isEqual(byteResponseServerSig,Instructions.UNKNOWN_CMD_SW))
+            if(utils.isEqual(byteResponseServerSig,Instructions.UNKNOWN_CMD_SW)||Utils.isEqual(byteResponseServerSig,Instructions.NOTYET))
             {
+                ResponseAPDU responseResultOfCom=channel.transmit(new CommandAPDU(Instructions.returnDoneCOM(false)));
                 card.disconnect(false);
                 return false;
             }
@@ -177,6 +189,9 @@ public class Terminal {
             System.out.println("Answer is: "+utils.bytesToHex(aesResponseBytes));
             EndTime=System.nanoTime();
             System.out.println("Aes APDU took "+(EndTime-StartTime)/1000000+" ms");
+            byte [] ResultCom=Instructions.returnDoneCOM(isItTrue);
+            System.out.println("sending "+Utils.bytesToHex(ResultCom));
+            ResponseAPDU responseResultOfCom=channel.transmit(new CommandAPDU(ResultCom));
             card.disconnect(false);
             return isItTrue;
 
