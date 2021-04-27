@@ -1,5 +1,7 @@
 package cz.vutbr.feec.klaso;
 
+import org.bouncycastle.math.ec.ECPoint;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -17,10 +19,25 @@ public class Options {
     public static HashMap<String,BigInteger> KeyPairs256;
     public static byte[] ActiveID;
 
+    public static byte[] GetPubKey(int secLevel){
+        int secOld=SECURITY_LEVEL;
+        setSecurityLevel(secLevel);
+        CurveSpecifics cs=new CurveSpecifics();
+        ECPoint PubPoint=cs.getG().multiply(getSecKey());
+        byte [] PubBytes=PubPoint.getEncoded(true);
+        setSecurityLevel(secOld);
+        return PubBytes;
+    }
     public static void DelID(byte[] ID)
     {
-        KeyPairs256.remove(Utils.bytesToHex(ID));
-        KeyPairs224.remove(Utils.bytesToHex(ID));
+        try {
+            KeyPairs256.remove(Utils.bytesToHex(ID));
+            KeyPairs224.remove(Utils.bytesToHex(ID));
+        }catch (Exception e)
+        {
+            System.out.println("Deletion did not happen, probably not found");
+        }
+
         System.out.println("ID "+Utils.bytesToHex(ID) +"was deleted");
     }
     public static int numOfDevWithActiveID()

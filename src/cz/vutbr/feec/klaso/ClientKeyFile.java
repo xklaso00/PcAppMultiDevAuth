@@ -43,6 +43,7 @@ public class ClientKeyFile {
             in.close();
             fileIn.close();
             System.out.println("Key pars has been loaded from "+keyFile);
+
         }
         catch (IOException | ClassNotFoundException e){
             System.out.println(e.toString());

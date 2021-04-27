@@ -56,11 +56,15 @@ public class Terminal {
         }
     }
 
-    public static boolean SingleDevAuth(boolean disconnectCard)
+    public static boolean SingleDevAuth(boolean disconnectCard, boolean isRegistrationCall)
     {
-        boolean cont=InitializeCardConnection();
-        if(!cont)
-            return false;
+        if(!isRegistrationCall)
+        {
+            boolean cont=InitializeCardConnection();
+            if(!cont)
+                return false;
+        }
+
         try {
             BigInteger hashOfServer=ecOperations.hashOfProver(ID);
             byte[] byteHash= utils.bytesFromBigInteger(hashOfServer);
@@ -77,15 +81,23 @@ public class Terminal {
             byte [] ClientID= Arrays.copyOfRange(byteResponseServerSig,0,5);
             byte [] ClientHash= Arrays.copyOfRange(byteResponseServerSig,5,Options.BYTELENGHT+5);
             byte [] ClientSig= Arrays.copyOfRange(byteResponseServerSig,Options.BYTELENGHT+5,byteResponseServerSig.length);
-            boolean isItTrue=ecOperations.verifyClientSig2(ClientID,ClientHash,ClientSig,PubKey,CommandToSave);
+            System.out.println(Utils.bytesToHex(Utils.bytesFromBigInteger(Options.GetKey(0))));
+            boolean isItTrue=ecOperations.verifyClientSig2(ClientID,ClientHash,ClientSig,Utils.bytesFromBigInteger(Options.GetKey(0)),CommandToSave);
             System.out.println("is it legit tho? "+isItTrue);
 
 
             if(disconnectCard) {
-                byte [] ResultCom=Instructions.returnDoneCOM(isItTrue);
+                byte [] ResultCom;
+                if(isRegistrationCall)
+                    ResultCom=Instructions.ReturnRegisterConformationCOM(isItTrue);
+                else
+                    ResultCom=Instructions.returnDoneCOM(isItTrue);
                 ResponseAPDU responseResultOfCom=channel.transmit(new CommandAPDU(ResultCom));
+                byte [] resRes=responseResultOfCom.getBytes();
+                System.out.println("Answer last is "+Utils.bytesToHex(resRes));
                 card.disconnect(false);
             }
+            SecondWindow sw=new SecondWindow();
             return  isItTrue;
 
         }
@@ -99,37 +111,10 @@ public class Terminal {
         return false;
     }
 
-    public static boolean MultiDevAuth()
+    public static boolean MultiDevAuth(boolean isRegistrationCall)
     {
         InitializeCardConnection();
-        //Card card = null;
-        //CardChannel channel = null;
-        //Utils utils= new Utils();
-        //byte [] ID;
-        /*Instructions instructions = new Instructions();
-        try {
-            TerminalFactory factory = TerminalFactory.getDefault();
-            List<CardTerminal> terminals = factory.terminals().list();
-            System.out.println("Terminals: " + terminals);
-            CardTerminal terminal = terminals.get(0);
-            ECOperations ecOperations= new ECOperations();
-            try {
-                while (!terminal.isCardPresent()) ;
-                // Connect wit the card, using supported protocol, for some reason T=0 not working
-                card = terminal.connect("*");
-                System.out.println("Card: " + card);
-                channel = card.getBasicChannel();
-            } catch (CardException ce) {
-                ce.printStackTrace();
-            }
-            //send choose AID command and get a response
-            long StartTime = System.nanoTime();
-            ResponseAPDU response1 = channel.transmit(new CommandAPDU(instructions.getAID()));
-            byte[] byteResponse1 = null;
-            byteResponse1 = response1.getBytes();
-            System.out.println("Card response for choose AID command: " + utils.bytesToHex(byteResponse1));
-            ID= Arrays.copyOfRange(byteResponse1,0,byteResponse1.length-2);
-            Options.setID(ID);*/
+
         try {
             //System.out.println("To get apdu answer it took "+(System.nanoTime()-StartTime)/1000000+" ms");
             long ST1=System.nanoTime();
@@ -189,7 +174,11 @@ public class Terminal {
             System.out.println("Answer is: "+utils.bytesToHex(aesResponseBytes));
             EndTime=System.nanoTime();
             System.out.println("Aes APDU took "+(EndTime-StartTime)/1000000+" ms");
-            byte [] ResultCom=Instructions.returnDoneCOM(isItTrue);
+            byte [] ResultCom;
+            if(isRegistrationCall)
+                ResultCom=Instructions.ReturnRegisterConformationCOM(isItTrue);
+            else
+                ResultCom=Instructions.returnDoneCOM(isItTrue);
             System.out.println("sending "+Utils.bytesToHex(ResultCom));
             ResponseAPDU responseResultOfCom=channel.transmit(new CommandAPDU(ResultCom));
             card.disconnect(false);
@@ -214,6 +203,13 @@ public class Terminal {
                 new Random().nextBytes(newID);
             } while (Options.HasID(newID));
             System.out.println("New ID is "+Utils.bytesToHex(newID));
+            Options.setID(newID);
+            byte[] PubKeysCom=Instructions.GeneratePubKeysCOM();
+            ResponseAPDU responsePubKeys=channel.transmit(new CommandAPDU(PubKeysCom));
+            byte[] responsePubKeysBytes=responsePubKeys.getBytes();
+            System.out.println("Answer to pub keys is "+Utils.bytesToHex(responsePubKeysBytes));
+
+
             byte[] IDCom=Instructions.generateRegisterDeviceCOM(newID);
             ResponseAPDU responseRegister = channel.transmit(new CommandAPDU(IDCom));
             byte[] responseRegisterBytes=responseRegister.getBytes();
@@ -228,8 +224,11 @@ public class Terminal {
             BigInteger Pub28=new BigInteger(1,NewPub28);
             byte[] devID= Utils.addFirstToByteArr((byte)0x00,newID);
             Options.addKeys(devID,Pub28,Pub32);
-            card.disconnect(false);
-            return true;
+
+            boolean AllRes=SingleDevAuth(true,true);
+
+            //card.disconnect(false);
+            return AllRes;
 
 
         }
@@ -241,7 +240,7 @@ public class Terminal {
     }
     public static boolean registerAnotherDevice()
     {
-        boolean singleDone= SingleDevAuth(false);
+        boolean singleDone= SingleDevAuth(false,false);
         if(!singleDone)
             return false;
         //this is here for testing to delete last watch key
@@ -275,7 +274,8 @@ public class Terminal {
             byte[] NewPub28=Arrays.copyOfRange(byteResponseReg,33,byteResponseReg.length);
             byte[] newDevID=Utils.addFirstToByteArr(byteIndex,Options.ActiveID);
             Options.addKeys(newDevID,new BigInteger(1,NewPub28),new BigInteger(1,NewPub32));
-            card.disconnect(false);
+            MultiDevAuth(true);
+            //card.disconnect(false);
             return true;
 
 

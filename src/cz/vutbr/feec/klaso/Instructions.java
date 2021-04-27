@@ -86,6 +86,13 @@ public class Instructions {
                     (byte)0x00,
                     (byte)0x05
             };
+    private static byte [] GIVEPUBS=
+            new byte[]{(byte)0x80,
+                    (byte)0x11,
+                    (byte)0x00,
+                    (byte)0x00,
+                    (byte)0x3E
+            };
 
     public static final byte[] UNKNOWN_CMD_SW = { (byte)0x00,
             (byte)0x00};
@@ -148,6 +155,16 @@ public class Instructions {
             return new byte[]{(byte)0x80, (byte)0x20,(byte)0x01,(byte)0x00,(byte)0x00};
     }
 
+    public static byte[] ReturnRegisterConformationCOM(boolean isItTrue)
+    {
+        if (isItTrue)
+            return new byte[]{(byte)0x80, (byte)0x21,(byte)0x00,(byte)0x00,(byte)0x00};
+        else
+            return new byte[]{(byte)0x80, (byte)0x21,(byte)0x01,(byte)0x00,(byte)0x00};
+    }
+    public static byte [] GeneratePubKeysCOM() throws IOException {
+        return Utils.mergeFourByteArrays(GIVEPUBS,Options.GetPubKey(2),Options.GetPubKey(1),(byte)0x00);
+    }
     public byte[] getAID() {
         return AID;
     }

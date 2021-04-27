@@ -121,6 +121,8 @@ public class ECOperations {
         byte [] hashToCheck = digest.digest(connectedBytes);
         outputStream.close();
         InicializeAES(tk.getEncoded(true));
+        System.out.println("hash i found is "+Utils.bytesToHex(hashToCheck));
+        System.out.println("hash i got is "+Utils.bytesToHex(clientHash));
         if(utils.isEqual(hashToCheck,clientHash))
             return true;
         else

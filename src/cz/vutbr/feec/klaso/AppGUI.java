@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.util.concurrent.ExecutionException;
 
 public class AppGUI extends  JFrame{
@@ -19,10 +20,54 @@ public class AppGUI extends  JFrame{
     private JLabel RegisterLabel;
     private JButton AnotherDevBttn;
     private JLabel SecDevLabel;
-
+    private JPasswordField adminPass;
+    private JButton LoginButton;
+    private JLabel AdminIn;
+    boolean hasAdmin=false;
+    newAdminGUI newWindow;
+    JFrame frame= new JFrame();
+    public void closeMe(){
+        dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+    }
     public AppGUI() {
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //frame.pack();
+        frame.add(PanelMain);
+        frame.pack();
+        frame.setSize(700,500);
+        frame.setVisible(true);
+        if(PassClass.LoadAdminPass())
+            hasAdmin=true;
+
+        if(!hasAdmin)
+            newWindow= new newAdminGUI(false);
+
+
+        Thread t = new Thread() {
+            public void run() {
+                while(true){
+
+                if(PassClass.isAdminIn())
+                {
+                    AdminIn.setVisible(true);
+                    AdminIn.setForeground(Color.BLUE);
+                    AdminIn.setText("Admin Logged in");
+                    break;
+                }
+                else {
+                    try {
+                        System.out.println("waiting..."+PassClass.isAdminIn());
+                        sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            }
+        };
+        t.start();
         //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        try {
+        /*try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
                     UIManager.setLookAndFeel(info.getClassName());
@@ -33,7 +78,9 @@ public class AppGUI extends  JFrame{
         catch (Exception e)
         {
 
-        }
+        }*/
+        //frame.setContentPane(new AppGUI().PanelMain);
+
 
         //comboBox1= new JComboBox(sec);
         //comboBox1.addItem("Security level 1");
@@ -44,7 +91,7 @@ public class AppGUI extends  JFrame{
                 SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
                     @Override
                     protected Boolean doInBackground() throws Exception {
-                        return Terminal.MultiDevAuth();
+                        return Terminal.MultiDevAuth(false);
                     }
 
                     // Can safely update the GUI from this method.
@@ -96,10 +143,11 @@ public class AppGUI extends  JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 SingleDevLabel.setText("You can put your phone near the NFC Reader");
+
                 SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
                     @Override
                     protected Boolean doInBackground() throws Exception {
-                        return Terminal.SingleDevAuth(true);
+                        return Terminal.SingleDevAuth(true,false);
                     }
 
                     // Can safely update the GUI from this method.
@@ -108,7 +156,11 @@ public class AppGUI extends  JFrame{
                         try {
                             status=get();
                             if(status)
+                            {
                                 SingleDevLabel.setText("Authentication Successful");
+                                frame.dispose();
+                            }
+
                             else
                                 SingleDevLabel.setText("Authentication Failed");
                             return;
@@ -126,6 +178,11 @@ public class AppGUI extends  JFrame{
         registerBttn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(!PassClass.isAdminIn())
+                {
+                    RegisterLabel.setText("You have to be logged as an Admin to add users");
+                    return;
+                }
                 RegisterLabel.setText("You can put your phone near the NFC Reader");
                 SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
                     @Override
@@ -157,6 +214,7 @@ public class AppGUI extends  JFrame{
         AnotherDevBttn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                SecDevLabel.setText("Put your phone near the NFC Reader");
                 SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
                     @Override
                     protected Boolean doInBackground() throws Exception {
@@ -181,6 +239,13 @@ public class AppGUI extends  JFrame{
 
                 };
                 worker.execute();
+            }
+        });
+        LoginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                newWindow=new newAdminGUI(true);
+
             }
         });
     }

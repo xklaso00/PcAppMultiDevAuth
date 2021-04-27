@@ -62,12 +62,6 @@
               <text value="Single Dev Authentication"/>
             </properties>
           </component>
-          <hspacer id="6ecb5">
-            <constraints>
-              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="0.0" weighty="0.5"/>
-            </constraints>
-          </hspacer>
           <component id="16fb0" class="javax.swing.JLabel" binding="SingleDevLabel">
             <constraints>
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
@@ -88,6 +82,16 @@
               <gridbag weightx="0.0" weighty="0.55"/>
             </constraints>
           </hspacer>
+          <component id="8e3bd" class="javax.swing.JLabel" binding="AdminIn">
+            <constraints>
+              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag top="0" left="20" bottom="0" right="20" weightx="0.0" weighty="0.1"/>
+            </constraints>
+            <properties>
+              <foreground color="-9109501"/>
+              <text value="Admin is not logged in"/>
+            </properties>
+          </component>
         </children>
       </grid>
       <grid id="33c6c" layout-manager="GridBagLayout">
@@ -102,7 +106,7 @@
         <children>
           <component id="8323a" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
             <constraints>
-              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="4" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
+              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="4" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="158" height="116"/>
               </grid>
               <gridbag top="0" left="20" bottom="0" right="20" weightx="1.0" weighty="0.3"/>
@@ -118,7 +122,7 @@
           </component>
           <component id="e03" class="javax.swing.JLabel" binding="LabelSec">
             <constraints>
-              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="1" fill="0" indent="0" use-parent-layout="false">
+              <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="1" fill="0" indent="0" use-parent-layout="false">
                 <minimum-size width="50" height="50"/>
               </grid>
               <gridbag weightx="1.0" weighty="0.1"/>
@@ -181,6 +185,15 @@
               <minimumSize width="250" height="16"/>
               <preferredSize width="250" height="16"/>
               <text value="Press this button to register alt Device"/>
+            </properties>
+          </component>
+          <component id="b7bd6" class="javax.swing.JButton" binding="LoginButton">
+            <constraints>
+              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag top="0" left="20" bottom="0" right="20" weightx="0.0" weighty="0.2"/>
+            </constraints>
+            <properties>
+              <text value="Login as admin"/>
             </properties>
           </component>
         </children>

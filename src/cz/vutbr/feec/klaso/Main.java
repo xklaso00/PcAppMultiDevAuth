@@ -38,13 +38,25 @@ public class Main {
         }
         ClientKeyFile.WriteHashMapToFile(IdKeyPairs,Options.SECURITY_LEVEL);*/
         Options.setMaps();
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("EX");
+        }
         AppGUI frame= new AppGUI();
-        frame.setContentPane(new AppGUI().PanelMain);
+        /*frame.setContentPane(new AppGUI().PanelMain);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setSize(700,500);
-        frame.setVisible(true);
+        frame.setVisible(true);*/
         //Terminal.MultiDevAuth();
         /*Options.setID(ID);
 
