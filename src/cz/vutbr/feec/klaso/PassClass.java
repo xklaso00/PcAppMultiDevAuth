@@ -13,8 +13,11 @@ import java.util.Optional;
 
 public class PassClass {
     private static String adminPassFile="AdminPass.ser";
+    private static String clientPassFile="clientPass.ser";
     private static HashMap<String, String[]> adminPassMap=new HashMap<String, String[]>();
+    private static HashMap<String, String[]> ClientPassMap=new HashMap<String, String[]>();
     private static boolean AdminIn=false;
+    private static boolean CurrentUserLegit=false;
     public static String hashPass(char[] pass, String salt)
     {
 
@@ -107,5 +110,68 @@ public class PassClass {
 
     public static boolean isAdminIn() {
         return AdminIn;
+    }
+    public static boolean addUserPass(String ID, char[] pass)
+    {
+        loadClientPasswords();
+        String Salt=generateSalt(64);
+        String HashedPass=hashPass(pass,Salt);
+        try {
+            String[] saltAndPass=new String[2];
+            saltAndPass[0]=HashedPass;
+            saltAndPass[1]=Salt;
+            ClientPassMap.put(ID,saltAndPass);
+            FileOutputStream fileOut = new FileOutputStream(clientPassFile);
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(ClientPassMap);
+            out.close();
+            fileOut.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+    public static boolean verifyUserPass(String ID,char[] pass)
+    {
+
+        CurrentUserLegit=false;
+        loadClientPasswords();
+        try {
+            String[] passAndSalt=ClientPassMap.get(ID);
+            String nowPass=hashPass(pass,passAndSalt[1]);
+            if(nowPass.equals(passAndSalt[0])) {
+                CurrentUserLegit=true;
+                return true;
+            }
+            else
+                return false;
+        }
+        catch (Exception e)
+        {
+            System.out.println("Exception in verify pass");
+        }
+        return false;
+    }
+    public static boolean loadClientPasswords()
+    {
+        try{
+            FileInputStream fileIn = new FileInputStream(clientPassFile);
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            ClientPassMap=(HashMap<String, String[]>)in.readObject();
+            in.close();
+            fileIn.close();
+            return true;
+        }
+        catch (IOException | ClassNotFoundException e)
+        {
+            System.out.println("No client Passes yet");
+        }
+        return false;
+    }
+
+    public static boolean isCurrentUserLegit() {
+        return CurrentUserLegit;
     }
 }

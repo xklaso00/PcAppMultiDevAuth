@@ -97,7 +97,9 @@ public class Terminal {
                 System.out.println("Answer last is "+Utils.bytesToHex(resRes));
                 card.disconnect(false);
             }
-            SecondWindow sw=new SecondWindow();
+            SecondWindow sw;
+           /* if(!isRegistrationCall)
+                sw=new SecondWindow();*/
             return  isItTrue;
 
         }
@@ -182,6 +184,7 @@ public class Terminal {
             System.out.println("sending "+Utils.bytesToHex(ResultCom));
             ResponseAPDU responseResultOfCom=channel.transmit(new CommandAPDU(ResultCom));
             card.disconnect(false);
+
             return isItTrue;
 
         }

@@ -25,6 +25,7 @@ public class AppGUI extends  JFrame{
     private JLabel AdminIn;
     boolean hasAdmin=false;
     newAdminGUI newWindow;
+    SecondWindow sw;
     JFrame frame= new JFrame();
     public void closeMe(){
         dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
@@ -36,17 +37,20 @@ public class AppGUI extends  JFrame{
         frame.pack();
         frame.setSize(700,500);
         frame.setVisible(true);
+        //Options.savePrivateKey();
+        //Options.loadPrivateKey();
         if(PassClass.LoadAdminPass())
             hasAdmin=true;
 
-        if(!hasAdmin)
-            newWindow= new newAdminGUI(false);
-
+        if(!hasAdmin) {
+            newWindow = new newAdminGUI(false, true);
+            Options.generateKeys();
+        }
+        ECOperations.GenerateTimeStamp();
 
         Thread t = new Thread() {
             public void run() {
                 while(true){
-
                 if(PassClass.isAdminIn())
                 {
                     AdminIn.setVisible(true);
@@ -56,7 +60,6 @@ public class AppGUI extends  JFrame{
                 }
                 else {
                     try {
-                        System.out.println("waiting..."+PassClass.isAdminIn());
                         sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -66,6 +69,8 @@ public class AppGUI extends  JFrame{
             }
         };
         t.start();
+
+
         //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         /*try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -99,8 +104,11 @@ public class AppGUI extends  JFrame{
                         boolean status;
                         try {
                             status=get();
-                            if(status)
+                            if(status) {
                                 readyLabel.setText("Authentication Successful");
+                                sw=new SecondWindow();
+                                frame.dispose();
+                            }
                             else
                                 readyLabel.setText("Authentication Failed");
                             return;
@@ -142,6 +150,33 @@ public class AppGUI extends  JFrame{
         singleAuthButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                Thread legitUserThread = new Thread() {
+                    public void run() {
+
+                        while(true){
+                            if(PassClass.isCurrentUserLegit())
+                            {
+                                sw=new SecondWindow();
+                                frame.dispose();
+                                break;
+                            }
+                            else {
+                                try {
+                                    sleep(1000);
+                                    System.out.println("Still alive");
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                    if(PassClass.isCurrentUserLegit())
+                                    {
+                                        sw=new SecondWindow();
+                                        frame.dispose();
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                };
                 SingleDevLabel.setText("You can put your phone near the NFC Reader");
 
                 SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
@@ -157,8 +192,13 @@ public class AppGUI extends  JFrame{
                             status=get();
                             if(status)
                             {
-                                SingleDevLabel.setText("Authentication Successful");
-                                frame.dispose();
+                                SingleDevLabel.setText("Authentication waiting for Password");
+                                legitUserThread.start();
+                                Options.ThreadName=legitUserThread.getName();
+                                newWindow= new newAdminGUI(true,false);
+
+
+                                //frame.dispose();
                             }
 
                             else
@@ -180,7 +220,7 @@ public class AppGUI extends  JFrame{
             public void actionPerformed(ActionEvent e) {
                 if(!PassClass.isAdminIn())
                 {
-                    RegisterLabel.setText("You have to be logged as an Admin to add users");
+                    RegisterLabel.setText("You have to be logged as an Admin to add a users");
                     return;
                 }
                 RegisterLabel.setText("You can put your phone near the NFC Reader");
@@ -195,8 +235,10 @@ public class AppGUI extends  JFrame{
                         boolean status;
                         try {
                             status=get();
-                            if(status)
-                                RegisterLabel.setText("Register Successful");
+                            if(status) {
+                                RegisterLabel.setText("Register done");
+                                newWindow= new newAdminGUI(false,false);
+                            }
                             else
                                 RegisterLabel.setText("Register Failed");
                             return;
@@ -244,7 +286,7 @@ public class AppGUI extends  JFrame{
         LoginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                newWindow=new newAdminGUI(true);
+                newWindow=new newAdminGUI(true,true);
 
             }
         });

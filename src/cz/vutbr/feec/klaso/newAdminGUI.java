@@ -11,7 +11,7 @@ public class newAdminGUI extends JFrame{
     private JButton confirmButton;
     private JLabel textField;
 
-    public newAdminGUI(boolean isLogin)
+    public newAdminGUI(boolean isLogin,boolean isAdmin)
     {
         try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -30,7 +30,7 @@ public class newAdminGUI extends JFrame{
 
         //frame.add(helloHowAreYouLabel);
         frame.setVisible(true);
-        if(!isLogin) {
+        if(!isLogin&&isAdmin) {
             confirmButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -41,7 +41,7 @@ public class newAdminGUI extends JFrame{
                 }
             });
         }
-        else
+        else if(isLogin&&isAdmin)
         {
             textField.setText("Put in your admin Password");
             confirmButton.addActionListener(new ActionListener() {
@@ -50,6 +50,42 @@ public class newAdminGUI extends JFrame{
                     char[] pass = newAdminField.getPassword();
                     boolean isit=PassClass.verAdminPass(pass);
                     System.out.println("Admin Logged in"+isit);
+                    frame.setVisible(false);
+                    frame.dispose();
+                }
+            });
+        }
+        else if(!isLogin)
+        {
+            textField.setText("Put in your new password");
+            confirmButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    char[] pass = newAdminField.getPassword();
+                    boolean isit=PassClass.addUserPass(Utils.bytesToHex(Options.ActiveID),pass);
+                    System.out.println("New Password "+isit);
+                    frame.setVisible(false);
+                    frame.dispose();
+                }
+            });
+        }
+        else
+        {
+            textField.setText("Put in your password");
+            confirmButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    char[] pass = newAdminField.getPassword();
+                    boolean isit=PassClass.verifyUserPass(Utils.bytesToHex(Options.ActiveID),pass);
+                    System.out.println("User is legit? "+isit);
+
+                    for(Thread t : Thread.getAllStackTraces().keySet()) {
+                        if(t.getName().equals(Options.ThreadName)) {
+                            System.out.println("Killing thread");
+                            t.interrupt();
+                            break;
+                        }
+                    }
                     frame.setVisible(false);
                     frame.dispose();
                 }

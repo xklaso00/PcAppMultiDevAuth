@@ -9,10 +9,13 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.Security;
+import java.security.*;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.spec.ECGenParameterSpec;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -20,20 +23,23 @@ import java.util.Random;
 public class ECOperations {
     Utils utils= new Utils();
     //those are parameters of secp256k1 curve so we can create it to do point operations
-    final static private BigInteger n = new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", 16);
-    BigInteger prime = new BigInteger("115792089237316195423570985008687907853269984665640564039457584007908834671663");
+    //final static private BigInteger n = new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", 16);
+   /* BigInteger prime = new BigInteger("115792089237316195423570985008687907853269984665640564039457584007908834671663");
     BigInteger A = new BigInteger("0");
     BigInteger B= new BigInteger("7");
     BigInteger Gx= new BigInteger("79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798", 16);
-    BigInteger Gy= new BigInteger("483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8", 16);
-    ECCurve ellipticCurve= new ECCurve.Fp(prime,A,B);
-    ECPoint G = ellipticCurve.createPoint(Gx,Gy);;
+    BigInteger Gy= new BigInteger("483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8", 16);*/
+    //ECCurve ellipticCurve= new ECCurve.Fp(prime,A,B);
+    //ECPoint G = ellipticCurve.createPoint(Gx,Gy);;
+    public static byte[]  PubKey224;
+    public static byte[] PubKey256;
     byte[] TvEncoded;
     BigInteger rand;
     BigInteger SecKey;
     private SecretKey AESKey;
     private byte[] lastIV;
     private ECPoint PubKeyTogether;
+    private byte[] lastTimeStamp;
     CurveSpecifics cs;
     public ECOperations()
     {
@@ -43,6 +49,9 @@ public class ECOperations {
         computeTv();
         System.out.println("Test encoding took "+(System.nanoTime()-start)/1000000+"ms");
 
+    }
+    public byte[] getLastTimeStamp() {
+        return lastTimeStamp;
     }
     public byte[] computeTv()
     {
@@ -195,6 +204,43 @@ public class ECOperations {
         else
             return false;
 
+    }
+    public static byte[] generateSecKey() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+
+        KeyPairGenerator g = KeyPairGenerator.getInstance("EC");
+        String curveName;
+        if(Options.SECURITY_LEVEL==1)
+            curveName="secp224r1";
+        else
+            curveName="secp256k1";
+        g.initialize(new ECGenParameterSpec(curveName), new SecureRandom());
+        KeyPair aKeyPair = g.generateKeyPair();
+        ECPrivateKey SecKeyA= (ECPrivateKey)aKeyPair.getPrivate();
+        BigInteger SKA= SecKeyA.getS();
+        ECPublicKey PubKeyA= (ECPublicKey)aKeyPair.getPublic();
+        java.security.spec.ECPoint PUK=PubKeyA.getW();
+        BigInteger pubByte = PUK.getAffineX();
+        BigInteger pubByteY= PUK.getAffineY();
+
+        ECPoint PUKA= CurveSpecifics.getCurve().createPoint(PUK.getAffineX(),PUK.getAffineY());
+
+        byte [] publicKeyA= PUKA.getEncoded(true);
+
+        if(Options.SECURITY_LEVEL==1)
+            PubKey224=publicKeyA;
+        else
+            PubKey256=publicKeyA;
+        return Utils.bytesFromBigInteger(SKA);
+    }
+    public static byte[] GenerateTimeStamp()
+    {
+        String stamp= ZonedDateTime
+                .now( ZoneId.systemDefault() )
+                .format( DateTimeFormatter.ofPattern( "uuuu.MM.dd.HH.mm.ss" ) );
+        System.out.println("Time stamp is "+stamp);
+        System.out.println("Bytes of this are "+Utils.bytesToHex(stamp.getBytes())+" length:"+stamp.getBytes().length);
+        byte[] timeBytes=stamp.getBytes();
+        return timeBytes;
     }
 
 }
