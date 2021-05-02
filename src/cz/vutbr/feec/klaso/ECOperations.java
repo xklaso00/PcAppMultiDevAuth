@@ -33,13 +33,14 @@ public class ECOperations {
     //ECPoint G = ellipticCurve.createPoint(Gx,Gy);;
     public static byte[]  PubKey224;
     public static byte[] PubKey256;
+    public static byte[] PubKey160;
     byte[] TvEncoded;
     BigInteger rand;
     BigInteger SecKey;
     private SecretKey AESKey;
     private byte[] lastIV;
     private ECPoint PubKeyTogether;
-    private byte[] lastTimeStamp;
+    private static byte[] lastTimeStamp;
     CurveSpecifics cs;
     public ECOperations()
     {
@@ -50,7 +51,7 @@ public class ECOperations {
         System.out.println("Test encoding took "+(System.nanoTime()-start)/1000000+"ms");
 
     }
-    public byte[] getLastTimeStamp() {
+    public static byte[] getLastTimeStamp() {
         return lastTimeStamp;
     }
     public byte[] computeTv()
@@ -75,17 +76,18 @@ public class ECOperations {
         computeTv();
 
         MessageDigest digest = null;
-        String typeOfHash;
-        if(Options.SECURITY_LEVEL==1)
+        String typeOfHash=Options.getHashName();
+        /*if(Options.SECURITY_LEVEL==1)
             typeOfHash="SHA-224";
         else
-            typeOfHash="SHA-256";
+            typeOfHash="SHA-256";*/
         digest = MessageDigest.getInstance(typeOfHash);
-
+        lastTimeStamp=GenerateTimeStamp();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
         outputStream.write(ID);
         outputStream.write(utils.bytesFromBigInteger(cs.getN()));
         outputStream.write(TvEncoded);
+        outputStream.write(lastTimeStamp);
         byte connectedBytes[] = outputStream.toByteArray( );
         byte [] hashToReturn = digest.digest(connectedBytes);
         outputStream.close();
@@ -111,13 +113,14 @@ public class ECOperations {
         ECPoint mid2=pubPoint.multiply(e);
         ECPoint t= mid.add(mid2);
         ECPoint tk=t.multiply(rand);
-
+        System.out.println("t is "+Utils.bytesToHex(t.getEncoded(true)));
+        System.out.println("tk is "+Utils.bytesToHex(tk.getEncoded(true)));
         MessageDigest digest = null;
-        String hashFunction;
-        if(Options.SECURITY_LEVEL==1)
+        String hashFunction=Options.getHashName();
+       /* if(Options.SECURITY_LEVEL==1)
             hashFunction="SHA-224";
         else
-            hashFunction="SHA-256";
+            hashFunction="SHA-256";*/
         digest = MessageDigest.getInstance(hashFunction);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
         outputStream.write(clientID);
@@ -138,23 +141,45 @@ public class ECOperations {
             return false;
     }
     public void InicializeAES(byte[] Tk) throws NoSuchAlgorithmException {
-        MessageDigest digest = null;
-        digest = MessageDigest.getInstance("SHA-256");
-        byte [] hash = digest.digest(Tk);
-        byte [] SecretKeyBytes= Arrays.copyOfRange(hash,0,hash.length/2);
-        AESKey= new SecretKeySpec(SecretKeyBytes, 0, SecretKeyBytes.length, "AES");
+        if(Options.SECURITY_LEVEL==1||Options.SECURITY_LEVEL==2) {
+            MessageDigest digest = null;
+            digest = MessageDigest.getInstance("SHA-256");
+            byte [] hash = digest.digest(Tk);
+            byte [] SecretKeyBytes= Arrays.copyOfRange(hash,0,hash.length/2);
+            AESKey= new SecretKeySpec(SecretKeyBytes, 0, SecretKeyBytes.length, "AES");
         /* byte [] SecretKeyBytes= Arrays.copyOfRange(Tk,1,Tk.length);
         AESKey= new SecretKeySpec(SecretKeyBytes, 0, SecretKeyBytes.length, "AES");*/
-        lastIV= new byte[12];
-        SecureRandom random = new SecureRandom();
-        random.nextBytes(lastIV);
+            lastIV= new byte[12];
+            SecureRandom random = new SecureRandom();
+            random.nextBytes(lastIV);
+        }
+        else
+        {
+            MessageDigest digest = null;
+            digest = MessageDigest.getInstance("SHA-256");
+            byte [] hash = digest.digest(Tk);
+            byte [] SecretKeyBytes= Arrays.copyOfRange(hash,0,24);
+            AESKey= new SecretKeySpec(SecretKeyBytes, 0, SecretKeyBytes.length, "DESede");
+            lastIV= new byte[8];
+            SecureRandom random = new SecureRandom();
+            random.nextBytes(lastIV);
+        }
+
     }
     public byte[] generateSecMsg(byte[] msg) throws Exception {
         System.out.println("Clear text is "+utils.bytesToHex(msg));
-        byte [] encrypted=AESGCMClass.encrypt(msg,AESKey,lastIV);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
-        outputStream.write(lastIV);
-        outputStream.write(encrypted);
+        if(Options.SECURITY_LEVEL==1||Options.SECURITY_LEVEL==2) {
+            byte [] encrypted=AESGCMClass.encrypt(msg,AESKey,lastIV);
+            outputStream.write(lastIV);
+            outputStream.write(encrypted);
+
+        }
+        else {
+            byte [] encrypted=DESClass.encrypt(msg,AESKey,lastIV);
+            outputStream.write(lastIV);
+            outputStream.write(encrypted);
+        }
         byte connectedBytes[] = outputStream.toByteArray( );
         System.out.println("connected is "+utils.bytesToHex(connectedBytes));
         outputStream.close();
@@ -182,11 +207,11 @@ public class ECOperations {
         System.out.println("tk is "+utils.bytesToHex(tk.getEncoded(true)));
 
         MessageDigest digest = null;
-        String typeOfHash;
-        if(Options.SECURITY_LEVEL==1)
+        String typeOfHash=Options.getHashName();
+       /* if(Options.SECURITY_LEVEL==1)
             typeOfHash="SHA-224";
         else
-            typeOfHash="SHA-256";
+            typeOfHash="SHA-256";*/
         digest = MessageDigest.getInstance(typeOfHash);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
         outputStream.write(ClientID);
@@ -211,8 +236,10 @@ public class ECOperations {
         String curveName;
         if(Options.SECURITY_LEVEL==1)
             curveName="secp224r1";
-        else
+        else if(Options.SECURITY_LEVEL==2)
             curveName="secp256k1";
+        else
+            curveName="secp160r1";
         g.initialize(new ECGenParameterSpec(curveName), new SecureRandom());
         KeyPair aKeyPair = g.generateKeyPair();
         ECPrivateKey SecKeyA= (ECPrivateKey)aKeyPair.getPrivate();
@@ -228,8 +255,10 @@ public class ECOperations {
 
         if(Options.SECURITY_LEVEL==1)
             PubKey224=publicKeyA;
-        else
+        else if(Options.SECURITY_LEVEL==2)
             PubKey256=publicKeyA;
+        else
+            PubKey160=publicKeyA;
         return Utils.bytesFromBigInteger(SKA);
     }
     public static byte[] GenerateTimeStamp()

@@ -7,13 +7,16 @@ import java.util.HashMap;
 public class ClientKeyFile {
     private static String keyFile224="ClientKeys224.ser";
     private static String keyFile256="ClientKeys256.ser";
+    private static String keyFile160="ClientKeys160.ser";
     public static void WriteHashMapToFile(HashMap<String, BigInteger> IdKeyPairs,int Security)
     {
         String keyFile;
         if(Security==1)
             keyFile=keyFile224;
-        else
+        else if(Security==2)
             keyFile=keyFile256;
+        else
+            keyFile=keyFile160;
         try {
             FileOutputStream fileOut = new FileOutputStream(keyFile);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
@@ -33,8 +36,10 @@ public class ClientKeyFile {
         String keyFile;
         if(Security==1)
             keyFile=keyFile224;
-        else
+        else if(Security==2)
             keyFile=keyFile256;
+        else
+            keyFile=keyFile160;
         try
         {
             FileInputStream fileIn = new FileInputStream(keyFile);

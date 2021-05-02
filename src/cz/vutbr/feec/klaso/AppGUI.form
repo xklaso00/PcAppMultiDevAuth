@@ -43,7 +43,7 @@
               <autoscrolls value="false"/>
               <doubleBuffered value="false"/>
               <focusable value="true"/>
-              <font name="JetBrains Mono" style="1"/>
+              <font name="JetBrains Mono" style="0"/>
               <horizontalAlignment value="0"/>
               <horizontalTextPosition value="2"/>
               <opaque value="false"/>
@@ -79,7 +79,7 @@
           <hspacer id="19a34">
             <constraints>
               <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="0.0" weighty="0.55"/>
+              <gridbag weightx="0.0" weighty="0.6"/>
             </constraints>
           </hspacer>
           <component id="8e3bd" class="javax.swing.JLabel" binding="AdminIn">
@@ -114,6 +114,7 @@
             <properties>
               <model>
                 <item value="Choose Security level"/>
+                <item value="Security level 0"/>
                 <item value="Security level 1"/>
                 <item value="Security level 2"/>
               </model>
@@ -135,13 +136,13 @@
           <hspacer id="fadcc">
             <constraints>
               <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="0.0" weighty="1.4"/>
+              <gridbag weightx="0.0" weighty="0.9"/>
             </constraints>
           </hspacer>
           <component id="4e15" class="javax.swing.JButton" binding="registerBttn">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag top="0" left="20" bottom="0" right="20" weightx="1.0" weighty="0.2"/>
+              <gridbag top="0" left="20" bottom="0" right="20" weightx="1.0" weighty="0.29"/>
             </constraints>
             <properties>
               <text value="Register phone"/>
@@ -150,7 +151,7 @@
           <component id="fed5b" class="javax.swing.JLabel" binding="RegisterLabel">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="1" fill="0" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="1.0" weighty="0.2"/>
+              <gridbag weightx="1.0" weighty="0.3"/>
             </constraints>
             <properties>
               <horizontalAlignment value="0"/>
@@ -167,7 +168,7 @@
           <component id="39ad7" class="javax.swing.JButton" binding="AnotherDevBttn">
             <constraints>
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag top="0" left="20" bottom="0" right="20" weightx="0.0" weighty="0.2"/>
+              <gridbag top="0" left="20" bottom="0" right="20" weightx="0.0" weighty="0.3"/>
             </constraints>
             <properties>
               <text value="Add Another Device"/>

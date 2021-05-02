@@ -83,6 +83,7 @@ public class Terminal {
             byte [] ClientSig= Arrays.copyOfRange(byteResponseServerSig,Options.BYTELENGHT+5,byteResponseServerSig.length);
             System.out.println(Utils.bytesToHex(Utils.bytesFromBigInteger(Options.GetKey(0))));
             boolean isItTrue=ecOperations.verifyClientSig2(ClientID,ClientHash,ClientSig,Utils.bytesFromBigInteger(Options.GetKey(0)),CommandToSave);
+            System.out.println("SIG is: "+utils.bytesToHex(ClientSig));
             System.out.println("is it legit tho? "+isItTrue);
 
 
@@ -221,12 +222,14 @@ public class Terminal {
                 return false;
 
             byte[] NewPub32=Arrays.copyOfRange(responseRegisterBytes,0,33);
-            byte[] NewPub28=Arrays.copyOfRange(responseRegisterBytes,33,responseRegisterBytes.length);
+            byte[] NewPub28=Arrays.copyOfRange(responseRegisterBytes,33,62);
+            byte[] NewPub20=Arrays.copyOfRange(responseRegisterBytes,62,responseRegisterBytes.length);
             ID=newID;
             BigInteger Pub32=new BigInteger(1,NewPub32);
             BigInteger Pub28=new BigInteger(1,NewPub28);
+            BigInteger Pub20=new BigInteger(1,NewPub20);
             byte[] devID= Utils.addFirstToByteArr((byte)0x00,newID);
-            Options.addKeys(devID,Pub28,Pub32);
+            Options.addKeys(devID,Pub28,Pub32,Pub20);
 
             boolean AllRes=SingleDevAuth(true,true);
 
@@ -274,9 +277,11 @@ public class Terminal {
             if(byteResponseReg.length<3)
                 return false;
             byte[] NewPub32=Arrays.copyOfRange(byteResponseReg,0,33);
-            byte[] NewPub28=Arrays.copyOfRange(byteResponseReg,33,byteResponseReg.length);
+            byte[] NewPub28=Arrays.copyOfRange(byteResponseReg,33,62);
+            byte[] NewPub20=Arrays.copyOfRange(byteResponseReg,62,byteResponseReg.length);
+            System.out.println("Watch Pub 20 is "+Utils.bytesToHex(NewPub20));
             byte[] newDevID=Utils.addFirstToByteArr(byteIndex,Options.ActiveID);
-            Options.addKeys(newDevID,new BigInteger(1,NewPub28),new BigInteger(1,NewPub32));
+            Options.addKeys(newDevID,new BigInteger(1,NewPub28),new BigInteger(1,NewPub32),new BigInteger(1,NewPub20));
             MultiDevAuth(true);
             //card.disconnect(false);
             return true;

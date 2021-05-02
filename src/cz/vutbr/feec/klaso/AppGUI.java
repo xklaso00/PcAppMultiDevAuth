@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.concurrent.ExecutionException;
 
@@ -46,7 +47,7 @@ public class AppGUI extends  JFrame{
             newWindow = new newAdminGUI(false, true);
             Options.generateKeys();
         }
-        ECOperations.GenerateTimeStamp();
+        //ECOperations.GenerateTimeStamp();
 
         Thread t = new Thread() {
             public void run() {
@@ -144,6 +145,11 @@ public class AppGUI extends  JFrame{
                         LabelSec.setText("Security level is 2");
                         Options.setSecurityLevel(2);
                         break;
+                    case "Security level 0":
+                        LabelSec.setText("Security level is 0");
+                        Options.setSecurityLevel(0);
+                        break;
+
                 }
             }
         });
@@ -171,6 +177,9 @@ public class AppGUI extends  JFrame{
                                         sw=new SecondWindow();
                                         frame.dispose();
                                     }
+                                    else {
+                                        SingleDevLabel.setText("Wrong Password");
+                                    }
                                     break;
                                 }
                             }
@@ -196,6 +205,7 @@ public class AppGUI extends  JFrame{
                                 legitUserThread.start();
                                 Options.ThreadName=legitUserThread.getName();
                                 newWindow= new newAdminGUI(true,false);
+
 
 
                                 //frame.dispose();

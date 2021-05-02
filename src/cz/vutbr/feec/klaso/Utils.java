@@ -59,7 +59,7 @@ public class Utils {
                 return buf;
             }
         }
-        else
+        else if(Options.SECURITY_LEVEL==1)
         {
             if(b.length>28) {
                 if (b[0] == 0) {
@@ -68,6 +68,19 @@ public class Utils {
                     b = tmp;
                 }
 
+            }
+            return b;
+        }
+        else
+        {
+            if (b.length > 20)
+            {
+                if (b[0] == 0)
+                {
+                    byte[] tmp = new byte[b.length - 1];
+                    System.arraycopy(b, 1, tmp, 0, tmp.length);
+                    b = tmp;
+                }
             }
             return b;
         }
@@ -110,6 +123,17 @@ public class Utils {
         outputStream.write(arr1);
         outputStream.write(arr2);
         outputStream.write(arr3);
+        outputStream.write(endByte);
+        byte[] result=outputStream.toByteArray();
+        outputStream.close();
+        return result;
+    }
+    public static byte[] mergeFiveByteArrays(byte[] arr1,byte[] arr2, byte[] arr3, byte[]arr4,byte endByte) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+        outputStream.write(arr1);
+        outputStream.write(arr2);
+        outputStream.write(arr3);
+        outputStream.write(arr4);
         outputStream.write(endByte);
         byte[] result=outputStream.toByteArray();
         outputStream.close();

@@ -1,5 +1,7 @@
 package cz.vutbr.feec.klaso;
 
+import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyFactorySpi;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 //class that stores instructions and can generate some
@@ -45,25 +47,37 @@ public class Instructions {
             (byte)0x05,
             (byte)0x02,
             (byte)0x00,
-            (byte)0x40,
+            (byte)0x53,
     };
     private byte [] COMSERVERSIG28= new byte[]{(byte)0x80,
             (byte)0x05,
             (byte)0x01,
             (byte)0x00,
-            (byte)0x38,
+            (byte)0x4B,
+    };
+    private byte [] COMSERVERSIG20= new byte[]{(byte)0x80,
+            (byte)0x05,
+            (byte)0x00,
+            (byte)0x00,
+            (byte)0x3B,
     };
     private byte [] COMSERVERSIGWATCH= new byte[]{(byte)0x80,
             (byte)0x07,
             (byte)0x02,
             (byte)0x00,
-            (byte)0x40,
+            (byte)0x53,
     };
     private byte [] COMSERVERSIGWATCH28= new byte[]{(byte)0x80,
             (byte)0x07,
             (byte)0x01,
             (byte)0x00,
-            (byte)0x38,
+            (byte)0x4B,
+    };
+    private byte [] COMSERVERSIGWATCH20= new byte[]{(byte)0x80,
+            (byte)0x07,
+            (byte)0x00,
+            (byte)0x00,
+            (byte)0x3B,
     };
     public static byte[] COMPLACEHOLDERCOM7=
             new byte[]{(byte)0x80,
@@ -91,7 +105,7 @@ public class Instructions {
                     (byte)0x11,
                     (byte)0x00,
                     (byte)0x00,
-                    (byte)0x3E
+                    (byte)0x53
             };
 
     public static final byte[] UNKNOWN_CMD_SW = { (byte)0x00,
@@ -105,12 +119,15 @@ public class Instructions {
         byte[] startOfCom;
         if(Options.SECURITY_LEVEL==1)
             startOfCom=COMSERVERSIG28;
-        else
+        else if(Options.SECURITY_LEVEL==2)
             startOfCom=COMSERVERSIG;
+        else
+            startOfCom=COMSERVERSIG20;
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
         outputStream.write(startOfCom);
         outputStream.write(hash);
         outputStream.write(sig);
+        outputStream.write(ECOperations.getLastTimeStamp());
         outputStream.write((byte)0x20);
         byte [] com=outputStream.toByteArray();
         outputStream.close();
@@ -121,13 +138,16 @@ public class Instructions {
         byte[] startOfCom;
         if(Options.SECURITY_LEVEL==1)
             startOfCom=COMSERVERSIGWATCH28;
-        else
+        else if(Options.SECURITY_LEVEL==2)
             startOfCom=COMSERVERSIGWATCH;
+        else
+            startOfCom=COMSERVERSIGWATCH20;
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
         outputStream.write(startOfCom);
         outputStream.write(hash);
         outputStream.write(sig);
+        outputStream.write(ECOperations.getLastTimeStamp());
         outputStream.write((byte)0x20);
         byte [] com=outputStream.toByteArray();
         outputStream.close();
@@ -163,7 +183,7 @@ public class Instructions {
             return new byte[]{(byte)0x80, (byte)0x21,(byte)0x01,(byte)0x00,(byte)0x00};
     }
     public static byte [] GeneratePubKeysCOM() throws IOException {
-        return Utils.mergeFourByteArrays(GIVEPUBS,Options.GetPubKey(2),Options.GetPubKey(1),(byte)0x00);
+        return Utils.mergeFiveByteArrays(GIVEPUBS,Options.GetPubKey(2),Options.GetPubKey(1),Options.GetPubKey(0),(byte)0x00);
     }
     public byte[] getAID() {
         return AID;

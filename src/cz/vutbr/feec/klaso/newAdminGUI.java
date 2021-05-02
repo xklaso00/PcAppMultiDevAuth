@@ -3,8 +3,11 @@ package cz.vutbr.feec.klaso;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-public class newAdminGUI extends JFrame{
+
+public class newAdminGUI extends JFrame  {
     JFrame frame= new JFrame();
     private JPanel PanelMain;
     private JPasswordField newAdminField;
@@ -24,10 +27,24 @@ public class newAdminGUI extends JFrame{
         catch (Exception e)
         { }
         frame.setSize(500,300);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         //frame.setContentPane(new SecondWindow().PanelMain);
         frame.add(PanelMain);
-
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent windowEvent){
+                if(!isAdmin&&isLogin)
+                {
+                    for(Thread t : Thread.getAllStackTraces().keySet()) {
+                        if(t.getName().equals(Options.ThreadName)) {
+                            System.out.println("Killing thread");
+                            t.interrupt();
+                            break;
+                        }
+                    }
+                }
+                frame.dispose();
+            }
+        });
         //frame.add(helloHowAreYouLabel);
         frame.setVisible(true);
         if(!isLogin&&isAdmin) {
@@ -43,6 +60,7 @@ public class newAdminGUI extends JFrame{
         }
         else if(isLogin&&isAdmin)
         {
+
             textField.setText("Put in your admin Password");
             confirmButton.addActionListener(new ActionListener() {
                 @Override
@@ -72,9 +90,11 @@ public class newAdminGUI extends JFrame{
         else
         {
             textField.setText("Put in your password");
+
             confirmButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+
                     char[] pass = newAdminField.getPassword();
                     boolean isit=PassClass.verifyUserPass(Utils.bytesToHex(Options.ActiveID),pass);
                     System.out.println("User is legit? "+isit);
