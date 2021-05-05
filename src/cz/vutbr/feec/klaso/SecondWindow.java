@@ -28,12 +28,14 @@ public class SecondWindow extends JFrame{
         }
         catch (Exception e)
         { }
-        frame.setSize(700,500);
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //frame.setContentPane(new SecondWindow().PanelMain);
         frame.add(PanelMain);
-
+        frame.pack();
+        frame.setSize(700,500);
         //frame.add(helloHowAreYouLabel);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
     }

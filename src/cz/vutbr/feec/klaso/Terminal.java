@@ -10,6 +10,8 @@ import java.util.Random;
 import static java.lang.Thread.sleep;
 
 public class Terminal {
+
+    private static long T1time;
     private static byte [] ID;
     private static Card card = null;
     private static CardChannel channel = null;
@@ -17,6 +19,22 @@ public class Terminal {
     private static Instructions instructions = new Instructions();
     private static byte [] PubKey;
     private static ECOperations ecOperations = new ECOperations();
+
+    public static void TrySendFailCom(boolean isAuthCall){
+        byte[] ResultCom=Instructions.returnDoneCOM(false);
+        if (!isAuthCall){
+            ResultCom=Instructions.ReturnRegisterConformationCOM(false);
+        }
+        try {
+            System.out.println("EXCEPTION sending "+Utils.bytesToHex(ResultCom));
+            ResponseAPDU responseResultOfCom=channel.transmit(new CommandAPDU(ResultCom));
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
     public static boolean InitializeCardConnection()
     {
         try {
@@ -36,6 +54,7 @@ public class Terminal {
             }
             //send choose AID command and get a response
             long StartTime = System.nanoTime();
+            T1time=System.nanoTime();
             ResponseAPDU response1 = channel.transmit(new CommandAPDU(instructions.getAID()));
             byte[] byteResponse1 = null;
             byteResponse1 = response1.getBytes();
@@ -52,8 +71,10 @@ public class Terminal {
         catch (Exception e)
         {
             System.out.println("Exception in card connection");
-            return false;
+
         }
+        TrySendFailCom(true);
+        return false;
     }
 
     public static boolean SingleDevAuth(boolean disconnectCard, boolean isRegistrationCall)
@@ -98,9 +119,7 @@ public class Terminal {
                 System.out.println("Answer last is "+Utils.bytesToHex(resRes));
                 card.disconnect(false);
             }
-            SecondWindow sw;
-           /* if(!isRegistrationCall)
-                sw=new SecondWindow();*/
+
             return  isItTrue;
 
         }
@@ -109,7 +128,7 @@ public class Terminal {
             System.out.println(e.toString());
 
         }
-
+        TrySendFailCom(true);
 
         return false;
     }
@@ -133,6 +152,7 @@ public class Terminal {
             long TimeToGetSign=System.nanoTime();
             byte[] byteResponseServerSig;
             byte[] CommandToSave2=CommandToSave;
+            System.out.println("T1 time is  " + (System.nanoTime() - T1time) / 1000000 + " ms");
             int timer=0;
             do {
                 timeForApduRes=System.nanoTime();
@@ -143,6 +163,8 @@ public class Terminal {
                 timer++;
                 sleep(100);
             }while(utils.isCommand(instructions.NOTYET,byteResponseServerSig)&&timer<15);
+
+            long T5time=System.nanoTime();
 
             System.out.println("To get back proof after successful command took "+ (System.nanoTime()-timeForApduRes)/1000000+" ms");
             if(utils.isEqual(byteResponseServerSig,Instructions.UNKNOWN_CMD_SW)||Utils.isEqual(byteResponseServerSig,Instructions.NOTYET))
@@ -166,6 +188,8 @@ public class Terminal {
             EndTime=System.nanoTime();
             System.out.println("is it legit tho? "+isItTrue);
             System.out.println("Only Verification took "+(EndTime-StartTime)/1000000+" ms");
+
+            System.out.println("T5 took " + (System.nanoTime() - T5time) / 1000000 + " ms");
             //AES test
             long aesTimer=System.nanoTime();
             byte[] secPart=ecOperations.generateSecMsg(ClientHash);
@@ -193,7 +217,7 @@ public class Terminal {
         {
             e.printStackTrace();
         }
-
+        TrySendFailCom(true);
         return false;
     }
     public static boolean RegisterUser()
@@ -218,9 +242,11 @@ public class Terminal {
             ResponseAPDU responseRegister = channel.transmit(new CommandAPDU(IDCom));
             byte[] responseRegisterBytes=responseRegister.getBytes();
             System.out.println("Response for register"+Utils.bytesToHex(responseRegisterBytes));
-            if(Utils.isCommand(responseRegisterBytes,Instructions.NOTYET))
+            if(Utils.isCommand(responseRegisterBytes,Instructions.NOTYET)) {
+                TrySendFailCom(false);
+                card.disconnect(false);
                 return false;
-
+            }
             byte[] NewPub32=Arrays.copyOfRange(responseRegisterBytes,0,33);
             byte[] NewPub28=Arrays.copyOfRange(responseRegisterBytes,33,62);
             byte[] NewPub20=Arrays.copyOfRange(responseRegisterBytes,62,responseRegisterBytes.length);
@@ -232,16 +258,14 @@ public class Terminal {
             Options.addKeys(devID,Pub28,Pub32,Pub20);
 
             boolean AllRes=SingleDevAuth(true,true);
-
             //card.disconnect(false);
             return AllRes;
-
-
         }
-        catch (IOException | CardException e)
+        catch (Exception e)
         {
             System.out.println(e.getMessage());
         }
+        TrySendFailCom(false);
         return false;
     }
     public static boolean registerAnotherDevice()
@@ -250,14 +274,14 @@ public class Terminal {
         if(!singleDone)
             return false;
         //this is here for testing to delete last watch key
-        try {
+        /*try {
             byte[] IDtoDel=Utils.addFirstToByteArr((byte)0x01,Options.ActiveID);
             Options.DelID(IDtoDel);
         }
         catch (Exception e)
         {
 
-        }
+        }*/
 
         int newIndex= Options.numOfDevWithActiveID();
         String hex = Integer.toHexString(newIndex);
@@ -265,7 +289,6 @@ public class Terminal {
         byte[] NewDevCom=Instructions.generateAddDevCOM(byteIndex);
         System.out.println("Command is "+Utils.bytesToHex(NewDevCom));
         try {
-
             byte[] byteResponseReg;
             do {
                 ResponseAPDU newDeviceResponse= channel.transmit(new CommandAPDU(NewDevCom));
@@ -274,23 +297,51 @@ public class Terminal {
                 //sleep(100);
             }while(utils.isCommand(instructions.NOTYET,byteResponseReg));
 
-            if(byteResponseReg.length<3)
+            if(byteResponseReg.length<3) {
+                TrySendFailCom(false);
+                card.disconnect(false);
                 return false;
+            }
             byte[] NewPub32=Arrays.copyOfRange(byteResponseReg,0,33);
             byte[] NewPub28=Arrays.copyOfRange(byteResponseReg,33,62);
             byte[] NewPub20=Arrays.copyOfRange(byteResponseReg,62,byteResponseReg.length);
             System.out.println("Watch Pub 20 is "+Utils.bytesToHex(NewPub20));
             byte[] newDevID=Utils.addFirstToByteArr(byteIndex,Options.ActiveID);
             Options.addKeys(newDevID,new BigInteger(1,NewPub28),new BigInteger(1,NewPub32),new BigInteger(1,NewPub20));
-            MultiDevAuth(true);
+            boolean working=MultiDevAuth(true);
             //card.disconnect(false);
-            return true;
+            if (working)
+                return true;
+            else{
+                try {
+                    byte[] IDtoDel=Utils.addFirstToByteArr(byteIndex,Options.ActiveID);
+                    Options.DelID(IDtoDel);
+                }catch (Exception e){
+
+                }
+            }
 
 
         } catch (CardException | IOException e) {
             e.printStackTrace();
         }
-
+        TrySendFailCom(false);
         return false;
+    }
+    public static boolean DeregisterSecondaryDevice(byte deviceNumber)
+    {
+        try {
+            byte[] IDtoDel=Utils.addFirstToByteArr(deviceNumber,Options.ActiveID);
+            Options.DelID(IDtoDel);
+            System.out.println("Secondary Device has been removed");
+            return true;
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+            System.out.println("Could not delete device, maybe that device is not registered");
+            return false;
+        }
+
     }
 }

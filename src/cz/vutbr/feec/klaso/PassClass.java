@@ -12,12 +12,16 @@ import java.util.HashMap;
 import java.util.Optional;
 
 public class PassClass {
-    private static String adminPassFile="AdminPass.ser";
-    private static String clientPassFile="clientPass.ser";
+    private static String adminPassFile="files\\AdminPass.ser";
+    private static String clientPassFile="files\\clientPass.ser";
     private static HashMap<String, String[]> adminPassMap=new HashMap<String, String[]>();
     private static HashMap<String, String[]> ClientPassMap=new HashMap<String, String[]>();
     private static boolean AdminIn=false;
     private static boolean CurrentUserLegit=false;
+    public static void unLog()
+    {
+        CurrentUserLegit=false;
+    }
     public static String hashPass(char[] pass, String salt)
     {
 

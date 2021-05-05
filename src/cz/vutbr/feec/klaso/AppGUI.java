@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class AppGUI extends  JFrame{
@@ -24,10 +25,15 @@ public class AppGUI extends  JFrame{
     private JPasswordField adminPass;
     private JButton LoginButton;
     private JLabel AdminIn;
+    private JButton removeSecondaryDeviceButton;
+    private JLabel removeSecText;
+    private JButton DelUserBtt;
+    private JLabel RemoveUserText;
     boolean hasAdmin=false;
     newAdminGUI newWindow;
     SecondWindow sw;
-    JFrame frame= new JFrame();
+    byte SecDevNumber=(byte)0x01;
+    JFrame frame= new JFrame("Multi Device Authentication Application");
     public void closeMe(){
         dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }
@@ -35,8 +41,10 @@ public class AppGUI extends  JFrame{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //frame.pack();
         frame.add(PanelMain);
+
         frame.pack();
         frame.setSize(700,500);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         //Options.savePrivateKey();
         //Options.loadPrivateKey();
@@ -156,7 +164,7 @@ public class AppGUI extends  JFrame{
         singleAuthButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Thread legitUserThread = new Thread() {
+                /*Thread legitUserThread = new Thread() {
                     public void run() {
 
                         while(true){
@@ -185,7 +193,7 @@ public class AppGUI extends  JFrame{
                             }
                         }
                     }
-                };
+                };*/
                 SingleDevLabel.setText("You can put your phone near the NFC Reader");
 
                 SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
@@ -193,7 +201,6 @@ public class AppGUI extends  JFrame{
                     protected Boolean doInBackground() throws Exception {
                         return Terminal.SingleDevAuth(true,false);
                     }
-
                     // Can safely update the GUI from this method.
                     protected void done() {
                         boolean status;
@@ -202,8 +209,12 @@ public class AppGUI extends  JFrame{
                             if(status)
                             {
                                 SingleDevLabel.setText("Authentication waiting for Password");
-                                legitUserThread.start();
-                                Options.ThreadName=legitUserThread.getName();
+                                CheckPass cp=new CheckPass(1);
+                                cp.start();
+                                Options.ThreadName=cp.getName();
+                               // legitUserThread.start();
+                                //Options.ThreadName=legitUserThread.getName();
+
                                 newWindow= new newAdminGUI(true,false);
 
 
@@ -220,7 +231,6 @@ public class AppGUI extends  JFrame{
                             e.printStackTrace();
                         }
                     }
-
                 };
                 worker.execute();
             }
@@ -230,7 +240,7 @@ public class AppGUI extends  JFrame{
             public void actionPerformed(ActionEvent e) {
                 if(!PassClass.isAdminIn())
                 {
-                    RegisterLabel.setText("You have to be logged as an Admin to add a users");
+                    RegisterLabel.setText("You have to be logged as an Admin to add users");
                     return;
                 }
                 RegisterLabel.setText("You can put your phone near the NFC Reader");
@@ -300,5 +310,95 @@ public class AppGUI extends  JFrame{
 
             }
         });
+        removeSecondaryDeviceButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                removeSecText.setText("You can put your phone on the reader");
+                SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
+                    @Override
+                    protected Boolean doInBackground() throws Exception {
+                        return Terminal.SingleDevAuth(true,false);
+                    }
+                    // Can safely update the GUI from this method.
+                    protected void done() {
+                        boolean status;
+                        try {
+                            status=get();
+                            if(status)
+                            {
+                                removeSecText.setText("Authentication waiting for Password");
+                                CheckPass cp=new CheckPass(2);
+                                cp.start();
+                                Options.ThreadName=cp.getName();
+                                newWindow= new newAdminGUI(true,false);
+                            }
+                            else
+                                removeSecText.setText("Authentication Failed");
+                            return;
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                worker.execute();
+
+
+            }
+        });
+        DelUserBtt.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(!PassClass.isAdminIn())
+                {
+                    RemoveUserText.setText("You have to be logged as an Admin to remove users");
+                    return;
+                }
+                IDwindow iDwindow=new IDwindow();
+            }
+        });
+    }
+    class CheckPass extends Thread {
+        int option;//option 1:singleDevAuth, option 2:Deregister 2nd Device
+        CheckPass(int option) {
+            this.option=option;
+        }
+        boolean exit = false;
+        public void run() {
+            while(true){
+                if(PassClass.isCurrentUserLegit())
+                {
+                    sw=new SecondWindow();
+                    frame.dispose();
+                    break;
+                }
+                else {
+                    try {
+                        sleep(1000);
+                        System.out.println("Still alive");
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        if(PassClass.isCurrentUserLegit()&&option==1)
+                        {
+                            sw=new SecondWindow();
+                            frame.dispose();
+                        }
+                        else if(PassClass.isCurrentUserLegit()&&option==2){
+                            boolean passed=Terminal.DeregisterSecondaryDevice(SecDevNumber);
+                            if (passed)
+                                removeSecText.setText("Secondary device removed.");
+                            else
+                                removeSecText.setText("Could not remove secondary device.");
+                            PassClass.unLog();
+                        }
+                        else {
+                            SingleDevLabel.setText("Wrong Password");
+                        }
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

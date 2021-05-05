@@ -5,9 +5,9 @@ import java.math.BigInteger;
 import java.util.HashMap;
 
 public class ClientKeyFile {
-    private static String keyFile224="ClientKeys224.ser";
-    private static String keyFile256="ClientKeys256.ser";
-    private static String keyFile160="ClientKeys160.ser";
+    private static String keyFile224="files\\ClientKeys224.ser";
+    private static String keyFile256="files\\ClientKeys256.ser";
+    private static String keyFile160="files\\ClientKeys160.ser";
     public static void WriteHashMapToFile(HashMap<String, BigInteger> IdKeyPairs,int Security)
     {
         String keyFile;

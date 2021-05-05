@@ -33,18 +33,53 @@ public class Options {
         setSecurityLevel(secOld);
         return PubBytes;
     }
-    public static void DelID(byte[] ID)
+    public static boolean DelUser(byte[] ID){
+        boolean deleteMore=true;
+        int i=0;
+
+        try {
+            if(!HasID(ID))
+                return false;
+            while(deleteMore){
+                String hex = Integer.toHexString(i);
+                byte index=Byte.parseByte(hex,16);
+                byte[] IDtoDel=Utils.addFirstToByteArr(index,ID);
+                deleteMore=DelID(IDtoDel);
+                i++;
+            }
+        }
+        catch (Exception e){
+            System.out.println("Exception in Del user \n"+e.getMessage());
+            return false;
+        }
+
+
+        return true;
+    }
+    public static boolean DelID(byte[] ID)
     {
+        if(!KeyPairs256.containsKey(Utils.bytesToHex(ID))){
+            System.out.println("Did not find ID"+Utils.bytesToHex(ID));
+            return false;
+        }
+        else
+            System.out.println("Did find ID in deletion");
         try {
             KeyPairs256.remove(Utils.bytesToHex(ID));
             KeyPairs224.remove(Utils.bytesToHex(ID));
             KeyPairs160.remove(Utils.bytesToHex(ID));
+            ClientKeyFile.WriteHashMapToFile(KeyPairs256,2);
+            ClientKeyFile.WriteHashMapToFile(KeyPairs224,1);
+            ClientKeyFile.WriteHashMapToFile(KeyPairs160,0);
+
         }catch (Exception e)
         {
-            System.out.println("Deletion did not happen, probably not found");
+            System.out.println("Deletion did not happen");
+            return false;
         }
 
         System.out.println("ID "+Utils.bytesToHex(ID) +"was deleted");
+        return true;
     }
     public static int numOfDevWithActiveID()
     {
@@ -171,23 +206,26 @@ public class Options {
     }
     public static void savePrivateKey()
     {
+
         BigInteger keyToSave;
         String fileName;
         if(SECURITY_LEVEL==1){
-            fileName="meKey224.ser";
+            fileName="files\\meKey224.ser";
             keyToSave=SecKey224;
         }
 
         else if(SECURITY_LEVEL==2) {
-            fileName="meKey256.ser";
+            fileName="files\\meKey256.ser";
             keyToSave=SecKey256;
         }
         else
         {
-            fileName="meKey160.ser";
+            fileName="files\\meKey160.ser";
         keyToSave=SecKey160;
         }
         try {
+            File file = new File(fileName);
+            file.getParentFile().mkdir();
             FileOutputStream fileOut = new FileOutputStream(fileName);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(keyToSave);

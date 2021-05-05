@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Arrays;
 
 
 public class newAdminGUI extends JFrame  {
@@ -13,6 +14,9 @@ public class newAdminGUI extends JFrame  {
     private JPasswordField newAdminField;
     private JButton confirmButton;
     private JLabel textField;
+    private JPasswordField confirmPassField;
+    private JLabel labelPas;
+    private JLabel ConfirmPassLabel;
 
     public newAdminGUI(boolean isLogin,boolean isAdmin)
     {
@@ -26,14 +30,20 @@ public class newAdminGUI extends JFrame  {
         }
         catch (Exception e)
         { }
-        frame.setSize(500,300);
+
+
         //frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         //frame.setContentPane(new SecondWindow().PanelMain);
+        frame.setTitle("Login Screen");
         frame.add(PanelMain);
+        frame.pack();
+        frame.setSize(500,300);
+        frame.setResizable(false);
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent windowEvent){
                 if(!isAdmin&&isLogin)
                 {
+
                     for(Thread t : Thread.getAllStackTraces().keySet()) {
                         if(t.getName().equals(Options.ThreadName)) {
                             System.out.println("Killing thread");
@@ -45,13 +55,20 @@ public class newAdminGUI extends JFrame  {
                 frame.dispose();
             }
         });
-        //frame.add(helloHowAreYouLabel);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         if(!isLogin&&isAdmin) {
             confirmButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     char[] pass = newAdminField.getPassword();
+                    char[] pass2 = confirmPassField.getPassword();
+
+                    if(!Arrays.equals(pass,pass2)){
+                        textField.setText("Both Passwords must be the same");
+                        return;
+                    }
+
                     PassClass.newAdminPass(pass);
                     System.out.println("Admin created");
                     frame.dispose();
@@ -60,7 +77,8 @@ public class newAdminGUI extends JFrame  {
         }
         else if(isLogin&&isAdmin)
         {
-
+            confirmPassField.setVisible(false);
+            ConfirmPassLabel.setVisible(false);
             textField.setText("Put in your admin Password");
             confirmButton.addActionListener(new ActionListener() {
                 @Override
@@ -79,7 +97,12 @@ public class newAdminGUI extends JFrame  {
             confirmButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    char[] pass = newAdminField.getPassword();
+                    char[] pass= newAdminField.getPassword();
+                    char[] pass2 = confirmPassField.getPassword();
+                    if(!Arrays.equals(pass,pass2)){
+                        textField.setText("Both Passwords must be the same");
+                        return;
+                    }
                     boolean isit=PassClass.addUserPass(Utils.bytesToHex(Options.ActiveID),pass);
                     System.out.println("New Password "+isit);
                     frame.setVisible(false);
@@ -89,6 +112,8 @@ public class newAdminGUI extends JFrame  {
         }
         else
         {
+            confirmPassField.setVisible(false);
+            ConfirmPassLabel.setVisible(false);
             textField.setText("Put in your password");
 
             confirmButton.addActionListener(new ActionListener() {

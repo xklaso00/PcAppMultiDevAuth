@@ -43,7 +43,6 @@
               <autoscrolls value="false"/>
               <doubleBuffered value="false"/>
               <focusable value="true"/>
-              <font name="JetBrains Mono" style="0"/>
               <horizontalAlignment value="0"/>
               <horizontalTextPosition value="2"/>
               <opaque value="false"/>
@@ -64,8 +63,8 @@
           </component>
           <component id="16fb0" class="javax.swing.JLabel" binding="SingleDevLabel">
             <constraints>
-              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="0.0" weighty="0.0"/>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="1" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.1"/>
             </constraints>
             <properties>
               <horizontalAlignment value="0"/>
@@ -76,15 +75,9 @@
               <text value="Press the button to start single Device Athentication"/>
             </properties>
           </component>
-          <hspacer id="19a34">
-            <constraints>
-              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="0.0" weighty="0.6"/>
-            </constraints>
-          </hspacer>
           <component id="8e3bd" class="javax.swing.JLabel" binding="AdminIn">
             <constraints>
-              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
               <gridbag top="0" left="20" bottom="0" right="20" weightx="0.0" weighty="0.1"/>
             </constraints>
             <properties>
@@ -92,6 +85,41 @@
               <text value="Admin is not logged in"/>
             </properties>
           </component>
+          <component id="b7bd6" class="javax.swing.JButton" binding="LoginButton">
+            <constraints>
+              <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag top="0" left="20" bottom="0" right="20" weightx="0.0" weighty="0.1"/>
+            </constraints>
+            <properties>
+              <text value="Login as admin"/>
+            </properties>
+          </component>
+          <component id="65563" class="javax.swing.JButton" binding="DelUserBtt">
+            <constraints>
+              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag top="0" left="20" bottom="0" right="20" weightx="0.0" weighty="0.1"/>
+            </constraints>
+            <properties>
+              <text value="Remove User"/>
+            </properties>
+          </component>
+          <component id="24717" class="javax.swing.JLabel" binding="RemoveUserText">
+            <constraints>
+              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="1" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.1"/>
+            </constraints>
+            <properties>
+              <opaque value="false"/>
+              <preferredSize width="290" height="16"/>
+              <text value="Press This button to remove a user with his ID"/>
+            </properties>
+          </component>
+          <hspacer id="19a34">
+            <constraints>
+              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.045"/>
+            </constraints>
+          </hspacer>
         </children>
       </grid>
       <grid id="33c6c" layout-manager="GridBagLayout">
@@ -106,10 +134,10 @@
         <children>
           <component id="8323a" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
             <constraints>
-              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="4" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
+              <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="4" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="158" height="116"/>
               </grid>
-              <gridbag top="0" left="20" bottom="0" right="20" weightx="1.0" weighty="0.3"/>
+              <gridbag top="0" left="20" bottom="0" right="20" weightx="1.0" weighty="0.1"/>
             </constraints>
             <properties>
               <model>
@@ -123,26 +151,21 @@
           </component>
           <component id="e03" class="javax.swing.JLabel" binding="LabelSec">
             <constraints>
-              <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="1" fill="0" indent="0" use-parent-layout="false">
+              <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false">
                 <minimum-size width="50" height="50"/>
               </grid>
               <gridbag weightx="1.0" weighty="0.1"/>
             </constraints>
             <properties>
+              <font style="1"/>
               <text value="Security level is 2"/>
               <verticalAlignment value="0"/>
             </properties>
           </component>
-          <hspacer id="fadcc">
-            <constraints>
-              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="0.0" weighty="0.9"/>
-            </constraints>
-          </hspacer>
           <component id="4e15" class="javax.swing.JButton" binding="registerBttn">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag top="0" left="20" bottom="0" right="20" weightx="1.0" weighty="0.29"/>
+              <gridbag top="0" left="20" bottom="0" right="20" weightx="1.0" weighty="0.1"/>
             </constraints>
             <properties>
               <text value="Register phone"/>
@@ -151,7 +174,7 @@
           <component id="fed5b" class="javax.swing.JLabel" binding="RegisterLabel">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="1" fill="0" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="1.0" weighty="0.3"/>
+              <gridbag weightx="1.0" weighty="0.1"/>
             </constraints>
             <properties>
               <horizontalAlignment value="0"/>
@@ -168,7 +191,7 @@
           <component id="39ad7" class="javax.swing.JButton" binding="AnotherDevBttn">
             <constraints>
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag top="0" left="20" bottom="0" right="20" weightx="0.0" weighty="0.3"/>
+              <gridbag top="0" left="20" bottom="0" right="20" weightx="0.0" weighty="0.1"/>
             </constraints>
             <properties>
               <text value="Add Another Device"/>
@@ -176,8 +199,8 @@
           </component>
           <component id="e5cb0" class="javax.swing.JLabel" binding="SecDevLabel">
             <constraints>
-              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="0.0" weighty="0.0"/>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="1" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.1"/>
             </constraints>
             <properties>
               <horizontalAlignment value="0"/>
@@ -188,13 +211,29 @@
               <text value="Press this button to register alt Device"/>
             </properties>
           </component>
-          <component id="b7bd6" class="javax.swing.JButton" binding="LoginButton">
+          <component id="425c" class="javax.swing.JButton" binding="removeSecondaryDeviceButton" default-binding="true">
             <constraints>
-              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag top="0" left="20" bottom="0" right="20" weightx="0.0" weighty="0.2"/>
+              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag top="0" left="20" bottom="0" right="20" weightx="0.0" weighty="0.1"/>
             </constraints>
             <properties>
-              <text value="Login as admin"/>
+              <text value="Remove Secondary Device"/>
+            </properties>
+          </component>
+          <hspacer id="a4003">
+            <constraints>
+              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.045"/>
+            </constraints>
+          </hspacer>
+          <component id="de52a" class="javax.swing.JLabel" binding="removeSecText">
+            <constraints>
+              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="1" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.1"/>
+            </constraints>
+            <properties>
+              <horizontalTextPosition value="0"/>
+              <text value="Press this button to remove Secondary Device"/>
             </properties>
           </component>
         </children>
