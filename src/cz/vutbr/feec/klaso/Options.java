@@ -232,6 +232,7 @@ public class Options {
             out.close();
             fileOut.close();
             System.out.println("Key saved to file "+fileName);
+
         }
         catch (IOException e)
         {
@@ -242,14 +243,14 @@ public class Options {
     {
         String fileName;
         if(SECURITY_LEVEL==1){
-            fileName="meKey224.ser";
+            fileName="files\\meKey224.ser";
         }
 
         else if(SECURITY_LEVEL==2){
-            fileName="meKey256.ser";
+            fileName="files\\meKey256.ser";
         }
         else
-            fileName="meKey160.ser";
+            fileName="files\\meKey160.ser";
         try
         {
             FileInputStream fileIn = new FileInputStream(fileName);

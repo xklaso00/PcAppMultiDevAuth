@@ -41,7 +41,7 @@ public class AppGUI extends  JFrame{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //frame.pack();
         frame.add(PanelMain);
-
+        //Options.loadPrivateKey();
         frame.pack();
         frame.setSize(700,500);
         frame.setLocationRelativeTo(null);
