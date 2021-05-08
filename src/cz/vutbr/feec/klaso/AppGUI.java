@@ -1,12 +1,13 @@
 package cz.vutbr.feec.klaso;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 public class AppGUI extends  JFrame{
@@ -29,6 +30,10 @@ public class AppGUI extends  JFrame{
     private JLabel removeSecText;
     private JButton DelUserBtt;
     private JLabel RemoveUserText;
+    private JPanel panel1;
+    private JPanel panel2;
+    private JPanel panel3;
+
     boolean hasAdmin=false;
     newAdminGUI newWindow;
     SecondWindow sw;
@@ -37,14 +42,38 @@ public class AppGUI extends  JFrame{
     public void closeMe(){
         dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }
-    public AppGUI() {
+
+
+
+
+
+
+    public AppGUI()  {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //frame.pack();
-        frame.add(PanelMain);
+
+        try {
+            frame.setLayout(new BorderLayout());
+            JLabel background=new JLabel(new ImageIcon("background2.jpg"));
+            frame.add(background);
+            //background.setSize(700,500);
+            background.setLayout(new GridLayout());
+            background.add(PanelMain);
+            PanelMain.setOpaque(false);
+            panel1.setOpaque(false);
+            panel2.setOpaque(false);
+            panel3.setOpaque(false);
+        }catch (Exception e){
+            System.out.println("Error in loading the background");
+            frame.add(PanelMain);
+        }
+
+
         //Options.loadPrivateKey();
         frame.pack();
+
         frame.setSize(700,500);
         frame.setLocationRelativeTo(null);
+
         frame.setVisible(true);
         //Options.savePrivateKey();
         //Options.loadPrivateKey();

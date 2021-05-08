@@ -1,6 +1,7 @@
 package cz.vutbr.feec.klaso;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -17,6 +18,9 @@ public class newAdminGUI extends JFrame  {
     private JPasswordField confirmPassField;
     private JLabel labelPas;
     private JLabel ConfirmPassLabel;
+    private JPanel panel1;
+    private JPanel panel2;
+    private JPanel panel3;
 
     public newAdminGUI(boolean isLogin,boolean isAdmin)
     {
@@ -35,7 +39,25 @@ public class newAdminGUI extends JFrame  {
         //frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         //frame.setContentPane(new SecondWindow().PanelMain);
         frame.setTitle("Login Screen");
-        frame.add(PanelMain);
+        try{
+            frame.setLayout(new BorderLayout());
+            JLabel background=new JLabel(new ImageIcon("backgroundSmall.jpg"));
+            frame.add(background);
+            //background.setSize(700,500);
+            background.setLayout(new GridLayout());
+            background.add(PanelMain);
+            PanelMain.setOpaque(false);
+            panel1.setOpaque(false);
+            panel2.setOpaque(false);
+            panel3.setOpaque(false);
+        }catch (Exception e){
+            System.out.println("Error in loading the background");
+            frame.add(PanelMain);
+        }
+
+
+
+        //frame.add(PanelMain);
         frame.pack();
         frame.setSize(500,300);
         frame.setResizable(false);
