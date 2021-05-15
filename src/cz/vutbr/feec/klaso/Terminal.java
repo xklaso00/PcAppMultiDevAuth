@@ -56,6 +56,7 @@ public class Terminal {
             long StartTime = System.nanoTime();
             T1time=System.nanoTime();
             ResponseAPDU response1 = channel.transmit(new CommandAPDU(instructions.getAID()));
+            System.out.println("Sending: " + utils.bytesToHex(instructions.getAID()));
             byte[] byteResponse1 = null;
             byteResponse1 = response1.getBytes();
             System.out.println("Card response for choose AID command: " + utils.bytesToHex(byteResponse1));
