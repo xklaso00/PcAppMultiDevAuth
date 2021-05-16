@@ -210,17 +210,17 @@ public class Options {
         BigInteger keyToSave;
         String fileName;
         if(SECURITY_LEVEL==1){
-            fileName="files\\meKey224.ser";
+            fileName="files/meKey224.ser";
             keyToSave=SecKey224;
         }
 
         else if(SECURITY_LEVEL==2) {
-            fileName="files\\meKey256.ser";
+            fileName="files/meKey256.ser";
             keyToSave=SecKey256;
         }
         else
         {
-            fileName="files\\meKey160.ser";
+            fileName="files/meKey160.ser";
         keyToSave=SecKey160;
         }
         try {
@@ -243,14 +243,14 @@ public class Options {
     {
         String fileName;
         if(SECURITY_LEVEL==1){
-            fileName="files\\meKey224.ser";
+            fileName="files/meKey224.ser";
         }
 
         else if(SECURITY_LEVEL==2){
-            fileName="files\\meKey256.ser";
+            fileName="files/meKey256.ser";
         }
         else
-            fileName="files\\meKey160.ser";
+            fileName="files/meKey160.ser";
         try
         {
             FileInputStream fileIn = new FileInputStream(fileName);

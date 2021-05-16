@@ -124,11 +124,12 @@ public class ECOperations {
         digest = MessageDigest.getInstance(hashFunction);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
         outputStream.write(clientID);
-
+        outputStream.write(Utils.bytesFromBigInteger(cs.getN()));
+        outputStream.write(lastTimeStamp);
         outputStream.write(t.getEncoded(true));
         outputStream.write(tk.getEncoded(true));
 
-        outputStream.write(prevMess);
+        //outputStream.write(prevMess);
         byte connectedBytes[] = outputStream.toByteArray( );
         byte [] hashToCheck = digest.digest(connectedBytes);
         outputStream.close();
@@ -215,9 +216,11 @@ public class ECOperations {
         digest = MessageDigest.getInstance(typeOfHash);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
         outputStream.write(ClientID);
+        outputStream.write(Utils.bytesFromBigInteger(cs.getN()));
+        outputStream.write(lastTimeStamp);
         outputStream.write(t.getEncoded(true));
         outputStream.write(tk.getEncoded(true));
-        outputStream.write(prevMSG);
+        //outputStream.write(prevMSG);
         byte connectedBytes[] = outputStream.toByteArray( );
         byte [] hashToCheck = digest.digest(connectedBytes);
         outputStream.close();
